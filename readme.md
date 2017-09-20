@@ -58,5 +58,8 @@ from this directory compiles `graph_viewer` with CUDA support.
 
 <a name="burtscher11"><sup>4</sup></a> M. Burtscher and K. Pingali, "An efficient CUDA implementation of the tree-based Barnes Hut n-body algorithm", in GPU Computing Gems Emerald Edition, W. mei W. Hwu, Ed., 2011, ch. 6, pp. 75–92.
 
+#### License
+Most source files for this program are released under the GNU Affero General Public License. The license notice in each file provides more information. A copy of the GNU Affero General Public License can be found in the `LICENCE` file.
+
 #### Disclaimer
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
