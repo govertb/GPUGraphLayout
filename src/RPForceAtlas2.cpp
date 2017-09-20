@@ -7,7 +7,7 @@
  Advanced Computer Science (www.liacs.nl). For other resources related to this
  project, see https://liacs.leidenuniv.nl/~takesfw/GPUNetworkVis/.
 
- Copyright (C) 2016  G. Brinkmann
+ Copyright © 2016, 2017  G. Brinkmann
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of version 3 of the GNU Affero General Public License as
