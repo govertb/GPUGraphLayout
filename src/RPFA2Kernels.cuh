@@ -24,8 +24,6 @@ This file is part of graph_viewer.
 #include <stdio.h>
 
 /// Some variables for FA2 related to `speed'
-__device__ float total_swingingd = 0.0;
-__device__ float total_effective_tractiond = 0.0;
 __device__ float k_s_maxd = 10.0;
 __device__ float global_speedd = 1.0;
 __device__ float speed_efficiencyd = 1.0;
