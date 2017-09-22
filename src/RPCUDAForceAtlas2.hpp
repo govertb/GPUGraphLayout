@@ -4,7 +4,7 @@
  RPCUDAForceAtlas2.hpp
  Copyright (C) 2016, 2017  G. Brinkmann
 
-This file is part of graph_viewer.
+ This file is part of graph_viewer.
 
  graph_viewer is free software: you can redistribute it and/or modify
  it under the terms of version 3 of the GNU Affero General Public License as
