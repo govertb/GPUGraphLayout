@@ -71,7 +71,7 @@ $(GRAPH_VIEWER_OBJS): $(GRAPH_VIEWER_SRCS)
 
 $(CUDA_OBJS): $(CUDA_SRCS) $(CUDA_DEPS)
 	mkdir -p $(@D)
-	nvcc -c $(CXXFLAGS) $(NVCCFLAGS) $(CPPFLAGS) -o $@ $(@:$(OBJ_DIR)/%.o=$(SRC_DIR)/%.cu)
+	nvcc --device-c $(CXXFLAGS) $(NVCCFLAGS) $(CPPFLAGS) -o $@ $(@:$(OBJ_DIR)/%.o=$(SRC_DIR)/%.cu)
 
 $(PNGWRITER_OBJS): $(PNGWRITER_SRCS)
 	mkdir -p $(@D)
