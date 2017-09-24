@@ -42,11 +42,11 @@ namespace RPGraph
         // Quick way to represent a graph on the GPU
         int *sources, *targets;
 
-        // Host pointers to device memory (all suffixed with 'l').
+        // Pointers to device memory (all suffixed with 'l').
         int   *errl,  *sortl, *childl, *countl, *startl;
         int   *sourcesl, *targetsl;
         float *massl, *posxl, *posyl;
-        float *minxl, *minyl, *maxxl, *maxyl; // Used in reduction.
+        float *minxl, *minyl, *maxxl, *maxyl;
         float *fxl, *fyl, *fx_prevl, *fy_prevl;
         float *swgl, *etral;
 
