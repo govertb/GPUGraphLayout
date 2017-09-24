@@ -14,14 +14,15 @@ NVCCFLAGS:=#-G
 # C preprocessor flags
 CPPFLAGS :=-D NO_FREETYPE
 ifeq ($(CUDA_SUPPORT), 1)
-	CPPFLAGS:=$(CPPFLAGS) -D __CUDA__ -isystem /usr/local/cuda/include/
+	CC:=nvcc
+	CPPFLAGS:=$(CPPFLAGS) -isystem /usr/local/cuda/include/
 endif
 ifeq ($(DEBUG_PRINTING), 1)
 	CPPFLAGS:=$(CPPFLAGS) -D DEBUGPRINT
 endif
 
 # Linker flags
-LDFLAGS  :=-lc -lm -lstdc++ -fopenmp -lpng
+LDFLAGS  :=-lc -lm -lstdc++ -lpng
 ifeq ($(CUDA_SUPPORT), 1)
 	LDFLAGS:=$(LDFLAGS) -L/usr/local/cuda/lib64 -lcudart
 endif
@@ -57,7 +58,7 @@ endif
 depend: .depend
 .depend: $(SRCS)
 	rm -f ./.depend
-	$(CC) $(CXXFLAGS) $(CPPFLAGS) -MM $(CPP_SRC) >> ./.depend
+	$(CC) $(CXXFLAGS) $(CPPFLAGS) -M $(CPP_SRC) >> ./.depend
 
 include ./.depend
 
@@ -66,7 +67,7 @@ graph_viewer: $(OBJECTS)
 
 $(GRAPH_VIEWER_OBJS): $(GRAPH_VIEWER_SRCS)
 	mkdir -p $(@D)
-	$(CC) -c $(CPPFLAGS) $(CXXFLAGS) --std=c++11 -o $@ $(@:$(OBJ_DIR)/%.o=$(SRC_DIR)/%.cpp)
+	$(CC) -c $(CPPFLAGS) $(CXXFLAGS) -o $@ $(@:$(OBJ_DIR)/%.o=$(SRC_DIR)/%.cpp)
 
 $(CUDA_OBJS): $(CUDA_SRCS) $(CUDA_DEPS)
 	mkdir -p $(@D)

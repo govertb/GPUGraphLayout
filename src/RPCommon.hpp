@@ -24,7 +24,7 @@
 #ifndef RPCommonUtils_hpp
 #define RPCommonUtils_hpp
 
-#ifdef __CUDA__
+#ifdef __NVCC__
 #include <cuda_runtime_api.h>
 #include <stdio.h>
 #include <stdlib.h>

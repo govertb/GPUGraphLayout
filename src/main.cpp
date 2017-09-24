@@ -39,7 +39,7 @@
 #include "RPGraphLayout.hpp"
 #include "RPForceAtlas2.hpp"
 
-#ifdef __CUDA__
+#ifdef __NVCC__
 #include <cuda_runtime_api.h>
 #include "RPCUDAForceAtlas2.hpp"
 #endif
@@ -90,7 +90,7 @@ int main(int argc, const char **argv)
 
     if(cuda_requested)
     {
-#ifdef __CUDA__
+#ifdef __NVCC__
         int deviceCount;
         cudaGetDeviceCount(&deviceCount);
         if (deviceCount == 0)
