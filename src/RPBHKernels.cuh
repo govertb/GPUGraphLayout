@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 /*
  The following code is a modified version of the CUDA BarnesHut v3.1 code
  by Martin Burtscher. Modifications were made to transform the code from a
@@ -48,6 +46,7 @@
  Author: Martin Burtscher <burtscher@txstate.edu>
  */
 
+ #include <stdio.h>
 
 // Global device variables
 __device__ volatile int stepd = -1;
