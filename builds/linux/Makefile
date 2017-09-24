@@ -24,7 +24,7 @@ endif
 # Linker flags
 LDFLAGS  :=-lc -lm -lstdc++ -lpng
 ifeq ($(CUDA_SUPPORT), 1)
-	LDFLAGS:=$(LDFLAGS) -L/usr/local/cuda/lib64 -lcudart
+	LDFLAGS:=$(LDFLAGS) -lcudart
 endif
 
 # src./obj. files
@@ -57,8 +57,8 @@ endif
 # ala http://stackoverflow.com/questions/2394609/makefile-header-dependencies
 depend: .depend
 .depend: $(SRCS)
-	rm -f ./.depend
-	$(CC) $(CXXFLAGS) $(CPPFLAGS) -M $(CPP_SRC) >> ./.depend
+	rm -f .depend
+	$(CC) $(CXXFLAGS) $(CPPFLAGS) -M $(CPP_SRC) >> .depend
 
 include ./.depend
 
