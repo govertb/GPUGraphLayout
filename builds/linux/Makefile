@@ -17,10 +17,6 @@ ifeq ($(CUDA_SUPPORT), 1)
 	CC:=nvcc
 	CPPFLAGS:=$(CPPFLAGS) -isystem /usr/local/cuda/include/
 endif
-ifeq ($(DEBUG_PRINTING), 1)
-	CPPFLAGS:=$(CPPFLAGS) -D DEBUGPRINT
-endif
-
 # Linker flags
 LDFLAGS  :=-lc -lm -lstdc++ -lpng
 ifeq ($(CUDA_SUPPORT), 1)
