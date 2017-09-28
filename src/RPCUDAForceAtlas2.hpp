@@ -23,17 +23,20 @@
 
 #ifndef RPCUDAForceAtlas2_hpp
 #define RPCUDAForceAtlas2_hpp
-#include "RPGraph.hpp"
-#include "RPGraphLayout.hpp"
+#include "RPForceAtlas2.hpp"
 
 namespace RPGraph
 {
-    class CUDAFA2Layout
+    class CUDAForceAtlas2: public ForceAtlas2
     {
-    private:
-        UGraph &graph;
-        float width, height;
+    public:
+        CUDAForceAtlas2(GraphLayout &layout);
+        ~CUDAForceAtlas2();
+        void benchmark() override;
+        void doStep() override;
+        void sync_layout() override;
 
+    private:
         /// CUDA Specific stuff.
         // Host storage.
         float *mass, *posx, *posy;
@@ -56,38 +59,10 @@ namespace RPGraph
         int nbodies;
         int nedges;
 
-        /// General FA2 stuf..
-        int iteration;
-
-        // Scalars for repulsive and gravitational force.
-        float k_r, k_g;
-        float delta; // edgeweight influence.
-        float global_speed;
-
-        // Parameters used in adaptive temperature
-        float speed_efficiency, jitter_tolerance;
-        float k_s, k_s_max; // magic constants related to swinging.
-        float theta;        // an accuracy parameter used for BarnesHut.
-
-    private:
         void sendGraphToGPU();
         void sendLayoutToGPU();
         void retrieveLayoutFromGPU();
         void freeGPUMemory();
-
-    public:
-        bool prevent_overlap, use_barneshut, use_linlog, strong_gravity;
-
-        CUDAFA2Layout(UGraph &graph, float width, float height);
-        ~CUDAFA2Layout();
-        void doStep();
-        void doSteps(int n);
-        void setScale(float s);
-        void setGravity(float s);
-
-
-        void benchmark();
-        void writeToPNG(const int width, const int height, const char *path);
     };
 };
 

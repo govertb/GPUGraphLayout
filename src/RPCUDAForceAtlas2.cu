@@ -28,66 +28,42 @@
 #include "time.h"
 
 #include "RPCUDAForceAtlas2.hpp"
-#include "RPCommon.hpp"
-
 #include "RPCUDALaunchParameters.cuh"
 #include "RPBHKernels.cuh"
 #include "RPFA2Kernels.cuh"
 
-#include "../lib/pngwriter/src/pngwriter.h"
-
 namespace RPGraph
 {
-    CUDAFA2Layout::CUDAFA2Layout(UGraph &graph, float width, float height)
-    : graph(graph), width(width), height(height)
+    CUDAForceAtlas2::CUDAForceAtlas2(GraphLayout &layout)
+    : ForceAtlas2(layout)
     {
-        // General FA2 code //
-        iteration = 0;
-
-        k_g = 1.0;
-        k_r = 1.0;
-
-        global_speed = 1.0;
-        speed_efficiency = 1.0;
-        jitter_tolerance = 1.0;
-
-        k_s = 0.1;
-        k_s_max = 10.0;
-        theta = 1.0;
-
-        delta = 0.0;
-
-        prevent_overlap = false;
-        strong_gravity = false;
-        use_barneshut = true;
-        use_linlog = false;
-
-        if (!use_barneshut)
+        int deviceCount;
+        cudaGetDeviceCount(&deviceCount);
+        if (deviceCount == 0)
         {
-            printf("RPCUDAForeceAtlas2 without Barnes-Hut approximation is not implemented yet.\n");
+            fprintf(stderr, "error: No CUDA devices found.\n");
             exit(EXIT_FAILURE);
         }
 
-
         // Host initialization and setup //
-        nbodies = graph.num_nodes();
-        nedges  = graph.num_edges();
+        nbodies = layout.graph.num_nodes();
+        nedges  = layout.graph.num_edges();
 
-        posx     = (float *)malloc(sizeof(float) * graph.num_nodes());
-        posy     = (float *)malloc(sizeof(float) * graph.num_nodes());
-        mass     = (float *)malloc(sizeof(float) * graph.num_nodes());
-        sources  = (int *)  malloc(sizeof(int)   * graph.num_edges());
-        targets  = (int *)  malloc(sizeof(int)   * graph.num_edges());
-        fx       = (float *)malloc(sizeof(float) * graph.num_nodes());
-        fy       = (float *)malloc(sizeof(float) * graph.num_nodes());
-        fx_prev  = (float *)malloc(sizeof(float) * graph.num_nodes());
-        fy_prev  = (float *)malloc(sizeof(float) * graph.num_nodes());
+        posx     = (float *)malloc(sizeof(float) * layout.graph.num_nodes());
+        posy     = (float *)malloc(sizeof(float) * layout.graph.num_nodes());
+        mass     = (float *)malloc(sizeof(float) * layout.graph.num_nodes());
+        sources  = (int *)  malloc(sizeof(int)   * layout.graph.num_edges());
+        targets  = (int *)  malloc(sizeof(int)   * layout.graph.num_edges());
+        fx       = (float *)malloc(sizeof(float) * layout.graph.num_nodes());
+        fy       = (float *)malloc(sizeof(float) * layout.graph.num_nodes());
+        fx_prev  = (float *)malloc(sizeof(float) * layout.graph.num_nodes());
+        fy_prev  = (float *)malloc(sizeof(float) * layout.graph.num_nodes());
 
-        for (nid_t n = 0; n <  graph.num_nodes(); ++n)
+        for (nid_t n = 0; n < layout.graph.num_nodes(); ++n)
         {
-            posx[n] = get_random(-width/2.0,  width/2.0);
-            posy[n] = get_random(-height/2.0, height/2.0);
-            mass[n] = graph.degree(n) + 1;
+            posx[n] = layout.getX(n);
+            posy[n] = layout.getY(n);
+            mass[n] = ForceAtlas2::mass(n);
             fx[n] = 0.0;
             fy[n] = 0.0;
             fx_prev[n] = 0.0;
@@ -98,9 +74,9 @@ namespace RPGraph
         int cur_targets_idx = 0;
 
         // Initialize the sources and targets arrays with edge-data.
-        for (nid_t source_id = 0; source_id < graph.num_nodes(); ++source_id)
+        for (nid_t source_id = 0; source_id < layout.graph.num_nodes(); ++source_id)
         {
-            for (nid_t target_id : graph.neighbors_with_geq_id(source_id))
+            for (nid_t target_id : layout.graph.neighbors_with_geq_id(source_id))
             {
                 sources[cur_sources_idx++] = source_id;
                 targets[cur_targets_idx++] = target_id;
@@ -185,7 +161,7 @@ namespace RPGraph
         cudaCatchError(cudaMemcpy(fy_prevl, fy_prev, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
     }
 
-    void CUDAFA2Layout::freeGPUMemory()
+    void CUDAForceAtlas2::freeGPUMemory()
     {
         cudaFree(childl);
 
@@ -212,7 +188,7 @@ namespace RPGraph
         cudaFree(etral);
     }
 
-    CUDAFA2Layout::~CUDAFA2Layout()
+    CUDAForceAtlas2::~CUDAForceAtlas2()
     {
         free(mass);
         free(posx);
@@ -227,7 +203,7 @@ namespace RPGraph
         freeGPUMemory();
     }
 
-    void CUDAFA2Layout::benchmark()
+    void CUDAForceAtlas2::benchmark()
     {
         printf("Using %d MPs\n", mp_count);
         const int num_reps = 5;
@@ -332,7 +308,7 @@ namespace RPGraph
         cudaEventDestroy(stop);
     }
 
-    void CUDAFA2Layout::doStep()
+    void CUDAForceAtlas2::doStep()
     {
         int err = 0;
 
@@ -385,101 +361,35 @@ namespace RPGraph
         iteration++;
     }
 
-    void CUDAFA2Layout::doSteps(int n)
+    void CUDAForceAtlas2::retrieveLayoutFromGPU()
     {
-        for (int i = 0; i < n; ++i) doStep();
-    }
-
-    void CUDAFA2Layout::setScale(float s)
-    {
-        k_r = s;
-    }
-
-    void CUDAFA2Layout::setGravity(float g)
-    {
-        k_g = g;
-    }
-
-    void CUDAFA2Layout::retrieveLayoutFromGPU()
-    {
-        cudaDeviceSynchronize();
         cudaCatchError(cudaMemcpy(posx, posxl, sizeof(float) * nbodies, cudaMemcpyDeviceToHost));
         cudaCatchError(cudaMemcpy(posy, posyl, sizeof(float) * nbodies, cudaMemcpyDeviceToHost));
-        cudaCatchError(cudaMemcpy(fx, fxl, sizeof(float) * nbodies, cudaMemcpyDeviceToHost));
-        cudaCatchError(cudaMemcpy(fy, fyl, sizeof(float) * nbodies, cudaMemcpyDeviceToHost));
-        cudaCatchError(cudaMemcpy(fx_prev, fx_prevl, sizeof(float) * nbodies, cudaMemcpyDeviceToHost));
-        cudaCatchError(cudaMemcpy(fy_prev, fy_prevl, sizeof(float) * nbodies, cudaMemcpyDeviceToHost));
+        cudaDeviceSynchronize();
     }
 
-    void CUDAFA2Layout::sendLayoutToGPU()
+    void CUDAForceAtlas2::sendLayoutToGPU()
     {
-        cudaDeviceSynchronize();
         cudaCatchError(cudaMemcpy(posxl, posx, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
         cudaCatchError(cudaMemcpy(posyl, posy, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
-        cudaCatchError(cudaMemcpy(fxl, fx,           sizeof(float) * nbodies, cudaMemcpyHostToDevice));
-        cudaCatchError(cudaMemcpy(fyl, fy,           sizeof(float) * nbodies, cudaMemcpyHostToDevice));
-        cudaCatchError(cudaMemcpy(fx_prevl, fx_prev, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
-        cudaCatchError(cudaMemcpy(fy_prevl, fy_prev, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
+        cudaDeviceSynchronize();
     }
 
-    void CUDAFA2Layout::sendGraphToGPU()
+    void CUDAForceAtlas2::sendGraphToGPU()
     {
-        cudaDeviceSynchronize();
         cudaCatchError(cudaMemcpy(massl, mass, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
         cudaCatchError(cudaMemcpy(sourcesl, sources, sizeof(int) * nedges, cudaMemcpyHostToDevice));
         cudaCatchError(cudaMemcpy(targetsl, targets, sizeof(int) * nedges, cudaMemcpyHostToDevice));
-    }
-
-
-    void CUDAFA2Layout::writeToPNG(const int width, const int height, const char *path)
-    {
-        cudaDeviceSynchronize(); // Wait for all kernels to complete.
-        ComputeLayoutDimensions<<<mp_count * FACTOR1, THREADS1>>>(nbodies, posxl, posyl, maxxl, maxyl, minxl, minyl);
-
-        // Retrieve data form GPU
-        float minx_h, maxx_h, miny_h, maxy_h;
         cudaDeviceSynchronize();
-        cudaCatchError(cudaMemcpyFromSymbol(&minx_h, minxdg, sizeof(float)));
-        cudaCatchError(cudaMemcpyFromSymbol(&maxx_h, maxxdg, sizeof(float)));
-        cudaCatchError(cudaMemcpyFromSymbol(&miny_h, minydg, sizeof(float)));
-        cudaCatchError(cudaMemcpyFromSymbol(&maxy_h, maxydg, sizeof(float)));
-        cudaCatchError(cudaMemcpy(posx, posxl,     sizeof(float) * nbodies, cudaMemcpyDeviceToHost));
-        cudaCatchError(cudaMemcpy(posy, posyl,     sizeof(float) * nbodies, cudaMemcpyDeviceToHost));
-        float img_width = 5000;
-        float img_height = 5000;
-
-        const float xRange = maxx_h - minx_h;
-        const float yRange = maxy_h - miny_h;
-        const float xCenter = minx_h + xRange / 2.0;
-        const float yCenter = miny_h + yRange / 2.0;
-        const float minX = xCenter - xRange   / 2.0;
-        const float minY = yCenter - yRange   / 2.0;
-        const float xScale = img_width/xRange;
-        const float yScale = img_height/yRange;
-
-        // Here we need to do some guessing as to what the optimal
-        // opacity of nodes and edges might be, given how many of them we need to draw.
-        const float node_opacity = 1/(0.0001  * graph.num_nodes());
-        const float edge_opacity = 1/(0.00001 * graph.num_edges());
-
-
-        pngwriter layout_png(img_width, img_height, 0, path);
-        layout_png.invert(); // set bg. to white.
-
-        for (int n1 = 0; n1 < graph.num_nodes(); ++n1)
+    }
+    
+    void CUDAForceAtlas2::sync_layout() 
+    {
+        retrieveLayoutFromGPU();
+        for(nid_t n = 0; n < layout.graph.num_nodes(); ++n)
         {
-            // Plot node,
-            layout_png.filledcircle_blend((posx[n1] - minX)*xScale,
-                                          (posy[n1] - minY)*yScale,
-                                          3, node_opacity, 0, 0, 0);
-            for (nid_t n2 : graph.neighbors_with_geq_id(n1)) {
-                // ... and edge.
-                layout_png.line_blend((posx[n1] - minX)*xScale, (posy[n1] - minY)*yScale,
-                                      (posx[n2] - minX)*xScale, (posy[n2] - minY)*yScale,
-                                      edge_opacity, 0, 0, 0);
-            }
+            layout.setX(n, posx[n]);
+            layout.setY(n, posy[n]);
         }
-        // Write to file.
-        layout_png.write_png();
     }
 }

@@ -47,6 +47,8 @@ namespace RPGraph
             virtual nid_t degree(nid_t nid) = 0;
             virtual nid_t in_degree(nid_t nid) = 0;
             virtual nid_t out_degree(nid_t nid) = 0;
+            virtual std::vector<nid_t> neighbors_with_geq_id(nid_t nid) = 0;
+
     };
 
     // Very basic (adjacency list) representation of an undirected graph.

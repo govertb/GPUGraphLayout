@@ -24,59 +24,35 @@
 #ifndef RPForceAtlas2_hpp
 #define RPForceAtlas2_hpp
 
-#include "RPGraphLayout.hpp"
+#include "RPLayoutAlgorithm.hpp"
 #include "RPBarnesHutApproximator.hpp"
-
 
 namespace RPGraph
 {
-    class FA2Layout : public GraphLayout
+    class ForceAtlas2 : public LayoutAlgorithm
     {
-    private:
-        Real2DVector *forces, *prev_forces;
-        int iteration;
+        public:
+            ForceAtlas2(GraphLayout &layout);
+            ~ForceAtlas2();
+            
+            virtual void doStep() = 0;
+            virtual void benchmark() = 0;
+            void doSteps(int n);
+            void setScale(float s);
+            void setGravity(float s);
+            float mass(nid_t n);
+            bool prevent_overlap, use_barneshut, use_linlog, strong_gravity;
 
-        // Scalars for repulsive and gravitational force.
-        float k_r, k_g;
-        float delta; // edgeweight influence.
-        float global_speed;
-
-        // Parameters used in adaptive temperature
-        float speed_efficiency, jitter_tolerance;
-        float k_s, k_s_max; // magic constants related to swinging.
-        float theta;        // an accuracy parameter used for BarnesHut.
-
-
-        BarnesHutApproximator *BH_Approximator = nullptr;
-
-        float runningtimes[10][6] = {{5.5,},};
-
-
-        float mass(nid_t n);
-        float swg(nid_t n);            // swinging ..
-        float s(nid_t n);              // swinging as well ..
-        float tra(nid_t n);            // traction ..
-
-        // Substeps of one step in layout process.
-        void apply_repulsion(nid_t n);
-        void apply_gravity(nid_t n);
-        void apply_attract(nid_t n);
-        void updateSpeeds();
-        void apply_displacement(nid_t n);
-
-    public:
-        bool prevent_overlap, use_barneshut, use_linlog, strong_gravity;
-
-        FA2Layout(UGraph &graph, float width, float height);
-        ~FA2Layout();
-        void doStep();
-        void doSteps(int n);
-        void setScale(float s);
-        void setGravity(float s);
-
-        void print_benchmarks();
-
+        protected:
+            int iteration;
+            float k_r, k_g; // scalars for repulsive and gravitational force.
+            float delta; // edgeweight influence.
+            float global_speed;
+            
+            // Parameters used in adaptive temperature
+            float speed_efficiency, jitter_tolerance;
+            float k_s, k_s_max; // magic constants related to swinging.
+            float theta;        // an accuracy parameter used for BarnesHut.
     };
 }
-
-#endif /* ForceAtlas2_hpp */
+#endif

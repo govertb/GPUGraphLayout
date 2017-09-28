@@ -51,18 +51,19 @@ namespace RPGraph
 
     class BarnesHutApproximator
     {
+    public:
+        BarnesHutApproximator(float theta, GraphLayout &layout);
+        Real2DVector approximateForce(Coordinate particle_pos, float particle_mass, float theta);
+        void insertParticle(Coordinate particle_position, float particle_mass);
+        
+        void rebuild();
+        void setTheta(float theta);
+
     private:
         GraphLayout &layout;
         BarnesHutCell *root_cell = nullptr;
         const float theta;
 
-    public:
-        BarnesHutApproximator(float theta, GraphLayout &layout);
-        Real2DVector approximateForce(Coordinate particle_pos, float particle_mass, float theta);
-        void insertParticle(Coordinate particle_position, float particle_mass);
-
-        void rebuild();
-        void setTheta(float theta);
     };
 }
 

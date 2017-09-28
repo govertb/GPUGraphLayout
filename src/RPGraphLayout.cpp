@@ -28,8 +28,6 @@
 #include <fstream>
 namespace RPGraph
 {
-    // Definitions for GraphLayout
-
     GraphLayout::GraphLayout(UGraph &graph, float width, float height)
         : graph(graph), width(width), height(height)
     {
@@ -165,8 +163,9 @@ namespace RPGraph
     {
         const float xRange = getXRange();
         const float yRange = getYRange();
-        const float xCenter = getCenter().x;
-        const float yCenter = getCenter().y;
+        const RPGraph::Coordinate center = getCenter();
+        const float xCenter = center.x;
+        const float yCenter = center.y;
         const float minX = xCenter - xRange/2.0;
         const float minY = yCenter - yRange/2.0;
         const float xScale = width/xRange;
@@ -179,18 +178,19 @@ namespace RPGraph
 
         // Write to file.
         pngwriter layout_png(width, height, 0, path);
-
-        for (int n1 = 0; n1 < graph.num_nodes(); ++n1)
+        layout_png.invert(); // set bg. to white
+        
+        for (nid_t n1 = 0; n1 < graph.num_nodes(); ++n1)
         {
             // Plot node,
             layout_png.filledcircle_blend((getX(n1) - minX)*xScale,
                                           (getY(n1) - minY)*yScale,
-                                          3, node_opacity, 1.0, 1.0, 1.0);
+                                          3, node_opacity, 0, 0, 0);
             for (nid_t n2 : graph.neighbors_with_geq_id(n1)) {
                 // ... and edge.
                 layout_png.line_blend((getX(n1) - minX)*xScale, (getY(n1) - minY)*yScale,
                                       (getX(n2) - minX)*xScale, (getY(n2) - minY)*yScale,
-                                      edge_opacity, 1.0, 1.0, 1.0);
+                                      edge_opacity, 0, 0, 0);
             }
         }
         // Write it to disk.

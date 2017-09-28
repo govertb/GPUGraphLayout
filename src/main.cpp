@@ -37,7 +37,7 @@
 #include "RPCommon.hpp"
 #include "RPGraph.hpp"
 #include "RPGraphLayout.hpp"
-#include "RPForceAtlas2.hpp"
+#include "RPCPUForceAtlas2.hpp"
 
 #ifdef __NVCC__
 #include <cuda_runtime_api.h>
@@ -70,6 +70,12 @@ int main(int argc, const char **argv)
     const float w = framesize;
     const float h = framesize;
 
+    if(cuda_requested and not approximate)
+    {
+        fprintf(stderr, "error: The CUDA implementation (currently) requires Barnes-Hut approximation.\n");
+        exit(EXIT_FAILURE);
+    }
+
     // Check in_path and out_path
     if (!is_file_exists(edgelist_path))
     {
@@ -82,42 +88,49 @@ int main(int argc, const char **argv)
         exit(EXIT_FAILURE);
     }
 
+    // If not compiled with cuda support, check if cuda is requested.
+    #ifndef __NVCC__
+    if(cuda_requested)
+    {
+        fprintf(stderr, "error: CUDA was requested, but not compiled for.\n");
+        exit(EXIT_FAILURE);
+    }
+    #endif
+
+    // Load graph.
     printf("Loading edgelist at '%s'...", edgelist_path);
     fflush(stdout);
     RPGraph::UGraph graph = RPGraph::UGraph(edgelist_path);
     printf("done.\n");
     printf("    fetched %d nodes and %d edges.\n", graph.num_nodes(), graph.num_edges());
 
-    if(cuda_requested)
+    // Create the GraphLayout and ForceAtlas2 objects.
+    RPGraph::GraphLayout layout(graph, w, h);
+    RPGraph::ForceAtlas2 *fa2;
+    if(!cuda_requested) fa2 = new RPGraph::CPUForceAtlas2(layout);
+    #ifdef __NVCC__
+    else fa2 = new RPGraph::CUDAForceAtlas2(layout);
+    #endif
+    
+    fa2->strong_gravity = strong_gravity;
+    fa2->use_barneshut = approximate;
+    fa2->setScale(scale);
+    fa2->setGravity(gravity);
+
+    if(testmode)
     {
-#ifdef __NVCC__
-        int deviceCount;
-        cudaGetDeviceCount(&deviceCount);
-        if (deviceCount == 0)
-        {
-            fprintf(stderr, "error: There is no device supporting CUDA...\n");
-            exit(EXIT_FAILURE);
-        }
-
-        RPGraph::CUDAFA2Layout layout(graph, w, h);
-        layout.strong_gravity = strong_gravity;
-        layout.use_barneshut = approximate;
-        layout.setScale(scale);
-        layout.setGravity(gravity);
-
-        if(testmode)
-        {
-	        layout.benchmark();
-	        exit(EXIT_SUCCESS);
-	    }
-
+        fa2->benchmark();
+        exit(EXIT_SUCCESS);
+    }
+    else
+    {
         printf("Started Layout algorithm...\n");
         const int snap_period = ceil((float)max_iterations/num_screenshots);
         const int print_period = ceil((float)max_iterations*0.05);
 
         for (int iteration = 1; iteration <= max_iterations; ++iteration)
         {
-            layout.doStep();
+            fa2->doStep();
             // If we need to, write the result to a png
             if (num_screenshots > 0 && (iteration % snap_period == 0 || iteration == max_iterations))
             {
@@ -125,6 +138,7 @@ int main(int argc, const char **argv)
                 op.append("/").append(std::to_string(iteration)).append(".png");
                 printf("Starting iteration %d (%.2f%%), writing png...", iteration, 100*(float)iteration/max_iterations);
                 fflush(stdout);
+                fa2->sync_layout();
                 layout.writeToPNG(framesize, framesize, op.c_str());
                 printf("done.\n");
             }
@@ -135,51 +149,7 @@ int main(int argc, const char **argv)
                 printf("Starting iteration %d (%.2f%%).\n", iteration, 100*(float)iteration/max_iterations);
             }
         }
-#else
-        fprintf(stderr, "error: CUDA was requested, but not compiled for.\n");
-        exit(EXIT_FAILURE);
-#endif
     }
-
-    else if(!cuda_requested)
-    {
-        // Create the layout
-        RPGraph::FA2Layout layout = RPGraph::FA2Layout(graph, w, h);
-        layout.strong_gravity = strong_gravity;
-        layout.use_barneshut = approximate;
-        layout.setScale(scale);
-        layout.setGravity(gravity);
-
-        if(testmode)
-        {
-            layout.doSteps(100);
-            layout.print_benchmarks();
-            exit(EXIT_SUCCESS);
-        }
-
-        printf("Started Layout algorithm...\n");
-        const int snap_period = ceil((float)max_iterations/num_screenshots);
-        const int print_period = ceil((float)max_iterations*0.05);
-        for (int iteration = 1; iteration <= max_iterations; ++iteration)
-        {
-            layout.doStep();
-            // If we need to, write the result to a png
-            if (num_screenshots > 0 && (iteration % snap_period == 0 || iteration == max_iterations))
-            {
-                std::string op(out_path);
-                op.append("/").append(std::to_string(iteration)).append(".png");
-                printf("At iteration %d (%.2f%%), writing png...", iteration, 100*(float)iteration/max_iterations);
-                fflush(stdout);
-                layout.writeToPNG(framesize, framesize, op.c_str());
-                printf("done.\n");
-            }
-
-            // Else we print (if we need to)
-            else if (iteration % print_period == 0)
-            {
-                printf("At iteration %d (%.2f%%).\n", iteration, 100*(float)iteration/max_iterations);
-            }
-        }
-    }
+    delete fa2;
     exit(EXIT_SUCCESS);
 }
