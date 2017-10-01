@@ -5,27 +5,26 @@ L_SRC_DIR         := ../../lib
 SRC_DIR           := ../../src
 OBJ_DIR           := obj
 
-# C/C++ compiler flags
-COMMON_FLAGS:=-O3
-CFLAGS   :=$(COMMON_FLAGS) -D NO_FREETYPE
-CXXFLAGS :=$(COMMON_FLAGS) -std=c++11 #-g
-NVCCFLAGS:=#-G
+# Compile with CUDA support by default
+CUDA_SUPPORT      ?= 1
 
 # C preprocessor flags
 CPPFLAGS :=-D NO_FREETYPE
 ifeq ($(CUDA_SUPPORT), 1)
 	CC:=nvcc
-	CPPFLAGS:=$(CPPFLAGS) -isystem /usr/local/cuda/include/
+	CPPFLAGS:=$(CPPFLAGS)
 endif
+
+# C/C++ compiler flags
+COMMON_FLAGS:=-O3
+CFLAGS   :=$(COMMON_FLAGS)
+CXXFLAGS :=$(COMMON_FLAGS) -std=c++11 #-g
+NVCCFLAGS:=#-G
+	
 # Linker flags
 LDFLAGS  :=-lc -lm -lstdc++ -lpng
-ifeq ($(CUDA_SUPPORT), 1)
-	LDFLAGS:=$(LDFLAGS) -lcudart
-endif
 
 # src./obj. files
-
-
 GRAPH_VIEWER_SRCS := $(wildcard $(SRC_DIR)/*.cpp)
 GRAPH_VIEWER_OBJS := $(GRAPH_VIEWER_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
@@ -35,9 +34,6 @@ PNGWRITER_OBJS    := $(PNGWRITER_SRCS:$(L_SRC_DIR)/%.cc=$(OBJ_DIR)/%.o)
 CUDA_SRCS         := $(wildcard $(SRC_DIR)/*.cu)
 CUDA_OBJS         := $(CUDA_SRCS:$(SRC_DIR)/%.cu=$(OBJ_DIR)/%.o)
 CUDA_DEPS         := $(wildcard $(SRC_DIR)/*.cuh)
-
-# Don't compile with CUDA support by default
-CUDA_SUPPORT      ?= 0
 
 CPP_SRC           := $(GRAPH_VIEWER_SRCS) $(PNGWRITER_SRCS)
 CUDA_SRC          := $(CUDA_SRCS)
