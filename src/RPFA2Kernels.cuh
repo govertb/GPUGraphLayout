@@ -24,7 +24,7 @@
 #ifndef RPFA2Kernels_cuh
 #define RPFA2Kernels_cuh
 
-#include "RPCUDALaunchParameters.cuh"
+#include "RPBHFA2LaunchParameters.cuh"
 
 __global__
 __launch_bounds__(THREADS6, FACTOR6)

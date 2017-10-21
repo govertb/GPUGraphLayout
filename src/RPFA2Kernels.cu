@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 #include "RPFA2Kernels.cuh"
-#include "RPCUDALaunchParameters.cuh"
+#include "RPBHFA2LaunchParameters.cuh"
 
 /// Some variables for FA2 related to `speed'
 static __device__ float k_s_maxd = 10.0;

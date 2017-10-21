@@ -28,7 +28,7 @@
 #include "time.h"
 
 #include "RPCUDAForceAtlas2.hpp"
-#include "RPCUDALaunchParameters.cuh"
+#include "RPBHFA2LaunchParameters.cuh"
 #include "RPBHKernels.cuh"
 #include "RPFA2Kernels.cuh"
 

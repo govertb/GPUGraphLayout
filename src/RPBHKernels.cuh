@@ -49,7 +49,7 @@
 #ifndef RPBHKernels_cuh
 #define RPBHKernels_cuh
 
-#include "RPCUDALaunchParameters.cuh"
+#include "RPBHFA2LaunchParameters.cuh"
 
 extern __device__ volatile int errd;
 extern __device__ float minxdg, minydg, maxxdg, maxydg;
