@@ -1,7 +1,7 @@
 /*
  ==============================================================================
 
- main.cpp
+ graph_viewer.cpp
  Copyright (C) 2016, 2017  G. Brinkmann
 
  This file is part of graph_viewer.
