@@ -23,8 +23,8 @@
 
 #include "RPCPUForceAtlas2.hpp"
 #include <stdlib.h>
-#include <float.h>
 #include <math.h>
+#include <limits>
 #include <cmath>
 #include <chrono>
 
@@ -60,7 +60,7 @@ namespace RPGraph
             if (use_linlog)
             {
                 float dist = layout.getDistance(n, t);
-                f_a_over_d = logf(1+dist) / dist;
+                f_a_over_d = dist == 0.0 ? std::numeric_limits<float>::max() : logf(1+dist) / dist;
             }
 
             else
@@ -91,9 +91,8 @@ namespace RPGraph
             for (nid_t t = 0; t < layout.graph.num_nodes(); ++t)
             {
                 if (n == t) continue;
-                float f_r;
                 float  distance = layout.getDistance(n, t);
-                distance == 0.0 ? f_r = FLT_MAX : k_r * mass(n) * mass(t) / distance / distance;
+                float f_r = distance == 0.0 ? std::numeric_limits<float>::max() : k_r * mass(n) * mass(t) / distance / distance;
                 forces[n] += layout.getDistanceVector(n, t) * f_r;
             }
         }
