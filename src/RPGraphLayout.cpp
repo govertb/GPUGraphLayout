@@ -198,4 +198,23 @@ namespace RPGraph
         // Write it to disk.
         layout_png.write_png();
     }
+
+    void GraphLayout::writeToFile(const char *path)
+    {
+        if (is_file_exists(path))
+        {
+            printf("Error: File exists at %s\n", path);
+            exit(EXIT_FAILURE);
+        }
+
+        std::ofstream out_file(path);
+
+        for (nid_t n = 0; n < graph.num_nodes(); ++n)
+        {
+            out_file << n << "," << getX(n) << "," << getY(n) << "\n";
+        }
+
+        out_file.close();
+    }
+
 }
