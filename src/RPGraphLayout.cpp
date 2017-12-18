@@ -26,6 +26,8 @@
 #include "../lib/pngwriter/src/pngwriter.h"
 
 #include <fstream>
+#include <cmath>
+
 namespace RPGraph
 {
     GraphLayout::GraphLayout(UGraph &graph, float width, float height)
@@ -104,7 +106,7 @@ namespace RPGraph
     {
         const float dx = getX(n1)-getX(n2);
         const float dy = getY(n1)-getY(n2);
-        return sqrtf(dx*dx + dy*dy);
+        return std::sqrt(dx*dx + dy*dy);
     }
 
     Real2DVector GraphLayout::getDistanceVector(nid_t n1, nid_t n2)
@@ -120,7 +122,7 @@ namespace RPGraph
         const float y2 = getY(n2);
         const float dx = x2 - x1;
         const float dy = y2 - y1;
-        const float len = sqrtf(dx*dx + dy*dy);
+        const float len = std::sqrt(dx*dx + dy*dy);
 
         return Real2DVector(dx / len, dy / len);
     }

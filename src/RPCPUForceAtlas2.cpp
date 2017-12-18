@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <float.h>
 #include <math.h>
+#include <cmath>
 #include <chrono>
 
 namespace RPGraph
@@ -103,7 +104,7 @@ namespace RPGraph
         float f_g, d;
 
         // `d' is the distance from `n' to the center (0.0, 0.0)
-        d = sqrtf(layout.getX(n)*layout.getX(n) + layout.getY(n)*layout.getY(n));
+        d = std::sqrt(layout.getX(n)*layout.getX(n) + layout.getY(n)*layout.getY(n));
         if(d == 0.0) return;
 
         // Here we define the magnitude of the gravitational force `f_g'.
@@ -129,7 +130,7 @@ namespace RPGraph
     // Eq. (9)
     float CPUForceAtlas2::s(nid_t n)
     {
-        return (k_s * global_speed)/(1.0f+global_speed*sqrtf(swg(n)));
+        return (k_s * global_speed)/(1.0f+global_speed*std::sqrt(swg(n)));
     }
 
     // Eq. (12)
@@ -156,8 +157,8 @@ namespace RPGraph
         // We want to find the right jitter tollerance for this graph,
         // such that totalSwinging < tolerance * totalEffectiveTraction
 
-        float estimated_optimal_jitter_tollerance = 0.05 * sqrtf(layout.graph.num_nodes());
-        float minJT = sqrtf(estimated_optimal_jitter_tollerance);
+        float estimated_optimal_jitter_tollerance = 0.05 * std::sqrt(layout.graph.num_nodes());
+        float minJT = std::sqrt(estimated_optimal_jitter_tollerance);
         float jt = jitter_tolerance * fmaxf(minJT,
                                            fminf(k_s_max,
                                                  estimated_optimal_jitter_tollerance * total_effective_traction / powf(layout.graph.num_nodes(), 2.0)
@@ -204,7 +205,7 @@ namespace RPGraph
         else
         {
 
-            float factor = global_speed / (1.0 + sqrtf(global_speed * swg(n)));
+            float factor = global_speed / (1.0 + std::sqrt(global_speed * swg(n)));
             layout.moveNode(n, forces[n] * factor);
         }
     }

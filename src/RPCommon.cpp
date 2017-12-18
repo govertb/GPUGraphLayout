@@ -22,8 +22,8 @@
 */
 
 #include "RPCommon.hpp"
-#include <math.h>
 #include <stdlib.h>
+#include <cmath>
 #include <fstream>
 
 // by http://stackoverflow.com/a/19841704
@@ -46,14 +46,14 @@ namespace RPGraph
 
     float Real2DVector::magnitude()
     {
-        return sqrtf(x*x + y*y);
+        return std::sqrt(x*x + y*y);
     }
 
     float Real2DVector::distance(RPGraph::Real2DVector to)
     {
         const float dx = (x - to.x)*(x - to.x);
         const float dy = (y - to.y)*(y - to.y);
-        return sqrtf(dx*dx + dy*dy);
+        return std::sqrt(dx*dx + dy*dy);
     }
 
     // Various operators on Real2DVector
@@ -134,7 +134,7 @@ namespace RPGraph
 
     float Coordinate::distance(RPGraph::Coordinate to)
     {
-        return sqrtf((x - to.x)*(x - to.x) + (y - to.y)*(y - to.y));
+        return std::sqrt((x - to.x)*(x - to.x) + (y - to.y)*(y - to.y));
     }
 
     float Coordinate::distance2(RPGraph::Coordinate to)
@@ -179,7 +179,7 @@ namespace RPGraph
     {
         const float dx = from.x - to.x;
         const float dy = from.y - to.y;
-        return sqrtf(dx*dx + dy*dy);
+        return std::sqrt(dx*dx + dy*dy);
     }
 
     float distance2(Coordinate from, Coordinate to)
@@ -193,7 +193,7 @@ namespace RPGraph
     {
         const float dx = from.x - to.x;
         const float dy = from.y - to.y;
-        const float len = sqrtf(dx*dx + dy*dy);
+        const float len = std::sqrt(dx*dx + dy*dy);
         return Real2DVector(dx/len, dy/len);
     }
 
