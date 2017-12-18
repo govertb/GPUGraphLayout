@@ -107,10 +107,12 @@ int main(int argc, const char **argv)
     // Create the GraphLayout and ForceAtlas2 objects.
     RPGraph::GraphLayout layout(graph, w, h);
     RPGraph::ForceAtlas2 *fa2;
-    if(!cuda_requested) fa2 = new RPGraph::CPUForceAtlas2(layout);
     #ifdef __NVCC__
-    else fa2 = new RPGraph::CUDAForceAtlas2(layout);
+    if(cuda_requested)
+        fa2 = new RPGraph::CUDAForceAtlas2(layout);
+    else
     #endif
+        fa2 = new RPGraph::CPUForceAtlas2(layout);
     
     fa2->strong_gravity = strong_gravity;
     fa2->use_barneshut = approximate;

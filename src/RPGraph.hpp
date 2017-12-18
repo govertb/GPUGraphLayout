@@ -76,7 +76,7 @@ namespace RPGraph
         virtual nid_t in_degree(nid_t nid) override;
         virtual nid_t out_degree(nid_t nid) override;
 
-        std::vector<nid_t> neighbors_with_geq_id(nid_t nid);
+        std::vector<nid_t> neighbors_with_geq_id(nid_t nid) override;
     };
 
     // Compressed sparserow (CSR) for undirected graphs.
