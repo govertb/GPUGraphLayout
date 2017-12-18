@@ -6,21 +6,28 @@ SRC_DIR           := ../../src
 OBJ_DIR           := obj
 
 # Compile with CUDA support by default
-CUDA_SUPPORT      ?= 1
+CUDA_SUPPORT ?= 1
+ifeq ($(CUDA_SUPPORT), 1)
+	CC:=nvcc
+endif
+
+# Debug compilation, disable by default
+DEBUG ?= 0
+ifeq ($(DEBUG), 1)
+	CXXFLAGS:=-g
+	NVCCFLAGS:=-G
+	O_LVL:=-O0
+else
+	O_LVL:=-O3
+endif
 
 # C preprocessor flags
 CPPFLAGS :=-D NO_FREETYPE
-ifeq ($(CUDA_SUPPORT), 1)
-	CC:=nvcc
-	CPPFLAGS:=$(CPPFLAGS)
-endif
 
 # C/C++ compiler flags
-COMMON_FLAGS:=-O3
-CFLAGS   :=$(COMMON_FLAGS)
-CXXFLAGS :=$(COMMON_FLAGS) -std=c++11 #-g
-NVCCFLAGS:=#-G
-	
+CFLAGS   :=$(O_LVL)
+CXXFLAGS :=$(O_LVL) -std=c++11
+
 # Linker flags
 LDFLAGS  :=-lc -lm -lstdc++ -lpng
 
