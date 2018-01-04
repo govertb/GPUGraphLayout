@@ -1,7 +1,7 @@
 /*
  ==============================================================================
 
- RPCUDAForceAtlas2.cu
+ RPGPUForceAtlas2.cu
  Copyright (C) 2016, 2017  G. Brinkmann
 
  This file is part of graph_viewer.
@@ -27,7 +27,7 @@
 #include <algorithm>
 #include "time.h"
 
-#include "RPCUDAForceAtlas2.hpp"
+#include "RPGPUForceAtlas2.hpp"
 #include "RPBHFA2LaunchParameters.cuh"
 #include "RPBHKernels.cuh"
 #include "RPFA2Kernels.cuh"

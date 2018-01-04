@@ -1,7 +1,7 @@
 /*
  ==============================================================================
 
- RPCUDAForceAtlas2.hpp
+ RPGPUForceAtlas2.hpp
  Copyright (C) 2016, 2017  G. Brinkmann
 
  This file is part of graph_viewer.
@@ -21,8 +21,8 @@
  ==============================================================================
 */
 
-#ifndef RPCUDAForceAtlas2_hpp
-#define RPCUDAForceAtlas2_hpp
+#ifndef RPGPUForceAtlas2_hpp
+#define RPGPUForceAtlas2_hpp
 #include "RPForceAtlas2.hpp"
 
 namespace RPGraph
@@ -67,4 +67,4 @@ namespace RPGraph
 };
 
 
-#endif /* RPCUDAForceAtlas2_hpp */
+#endif /* RPGPUForceAtlas2_hpp */

@@ -41,7 +41,7 @@
 
 #ifdef __NVCC__
 #include <cuda_runtime_api.h>
-#include "RPCUDAForceAtlas2.hpp"
+#include "RPGPUForceAtlas2.hpp"
 #endif
 
 int main(int argc, const char **argv)
