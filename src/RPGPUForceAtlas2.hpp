@@ -39,7 +39,8 @@ namespace RPGraph
     private:
         /// CUDA Specific stuff.
         // Host storage.
-        float *mass, *posx, *posy;
+        float *mass;
+        float2 *pos;
         float *fx, *fy, *fx_prev, *fy_prev;
 
         // Quick way to represent a graph on the GPU
@@ -48,7 +49,8 @@ namespace RPGraph
         // Pointers to device memory (all suffixed with 'l').
         int   *errl,  *sortl, *childl, *countl, *startl;
         int   *sourcesl, *targetsl;
-        float *massl, *posxl, *posyl;
+        float *massl;
+        float2 *posl;
         float *minxl, *minyl, *maxxl, *maxyl;
         float *fxl, *fyl, *fx_prevl, *fy_prevl;
         float *swgl, *etral;

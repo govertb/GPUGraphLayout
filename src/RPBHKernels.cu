@@ -71,7 +71,7 @@ __global__
 __launch_bounds__(THREADS1, FACTOR1)
 void BoundingBoxKernel(int nnodesd, int nbodiesd, volatile int * __restrict startd,
                        volatile int   * __restrict childd, volatile float * __restrict massd,
-                       volatile float * __restrict posxd,  volatile float * __restrict posyd,
+                       volatile float2 * __restrict posd,
                        volatile float * __restrict maxxd,  volatile float * __restrict maxyd,
                        volatile float * __restrict minxd,  volatile float * __restrict minyd)
 {
@@ -80,18 +80,18 @@ void BoundingBoxKernel(int nnodesd, int nbodiesd, volatile int * __restrict star
     __shared__ volatile float sminx[THREADS1], smaxx[THREADS1], sminy[THREADS1], smaxy[THREADS1];
 
     // initialize with valid data (in case #bodies < #threads)
-    minx = maxx = posxd[0];
-    miny = maxy = posyd[0];
+    minx = maxx = posd[0].x;
+    miny = maxy = posd[0].y;
 
     // scan all bodies
     i = threadIdx.x;
     inc = THREADS1 * gridDim.x;
     for (j = i + blockIdx.x * THREADS1; j < nbodiesd; j += inc)
     {
-        val = posxd[j];
+        val = posd[j].x;
         minx = fminf(minx, val);
         maxx = fmaxf(maxx, val);
-        val = posyd[j];
+        val = posd[j].y;
         miny = fminf(miny, val);
         maxy = fmaxf(maxy, val);
     }
@@ -144,8 +144,8 @@ void BoundingBoxKernel(int nnodesd, int nbodiesd, volatile int * __restrict star
             bottomd = k;
 
             massd[k] = -1.0f;
-            posxd[k] = (minx + maxx) * 0.5f;
-            posyd[k] = (miny + maxy) * 0.5f;
+            posd[k].x = (minx + maxx) * 0.5f;
+            posd[k].y = (miny + maxy) * 0.5f;
             startd[k] = 0;
 
             k *= 4; // skip over the children of all nodes
@@ -184,7 +184,7 @@ __launch_bounds__(1024, 1)void ClearKernel1(int nnodesd, int nbodiesd, volatile 
 __global__
 __launch_bounds__(THREADS2, FACTOR2)
 void TreeBuildingKernel(int nnodesd, int nbodiesd, volatile int * __restrict childd,
-                        volatile float * __restrict posxd, volatile float * __restrict posyd)
+                        volatile float2 * __restrict posd)
 {
     register int i, j, depth, localmaxdepth, skip, inc;
     register float x, y, r;
@@ -194,8 +194,8 @@ void TreeBuildingKernel(int nnodesd, int nbodiesd, volatile int * __restrict chi
     register float rootr, rootx, rooty;
 
     // cache root data
-    rootx = posxd[nnodesd];
-    rooty = posyd[nnodesd];
+    rootx = posd[nnodesd].x;
+    rooty = posd[nnodesd].y;
     rootr = radiusd;
 
     localmaxdepth = 1;
@@ -210,8 +210,8 @@ void TreeBuildingKernel(int nnodesd, int nbodiesd, volatile int * __restrict chi
         {
             // new body, so start traversing at root
             skip = 0;
-            px = posxd[i];
-            py = posyd[i];
+            px = posd[i].x;
+            py = posd[i].y;
             n = nnodesd;
             depth = 1;
             r = rootr * 0.5f;
@@ -268,10 +268,10 @@ void TreeBuildingKernel(int nnodesd, int nbodiesd, volatile int * __restrict chi
 
                     // if bodies have same position, offset the body to insert
                     // and redo traversal
-                    if (posxd[ch] == px && posyd[ch] == py)
+                    if (posd[ch].x == px && posd[ch].y == py)
                     {
-                        posxd[i] += .1;
-                        posyd[i] += .1;
+                        posd[i].x += .1;
+                        posd[i].y += .1;
                         skip = 0; // start all over
                         childd[locked] = ch; // release lock
                         break;
@@ -300,8 +300,8 @@ void TreeBuildingKernel(int nnodesd, int nbodiesd, volatile int * __restrict chi
 
                         // 3.) Insert old body into correct quadrant
                         j = 0;
-                        if (x < posxd[ch]) j  = 1;
-                        if (y < posyd[ch]) j |= 2;
+                        if (x < posd[ch].x) j  = 1;
+                        if (y < posd[ch].y) j |= 2;
                         childd[cell*4+j] = ch;
 
                         // 4.) Determine center + quadrant for cell of new body
@@ -362,7 +362,7 @@ void ClearKernel2(int nnodesd, volatile int * __restrict startd, volatile float 
 __global__
 __launch_bounds__(THREADS3, FACTOR3)
 void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * __restrict countd, const int * __restrict childd,
-                         volatile float * __restrict massd, volatile float * __restrict posxd, volatile float * __restrict posyd)
+                         volatile float * __restrict massd, volatile float2 * __restrict posd)
 {
     register int i, j, k, ch, inc, cnt, bottom, flag;
     register float m, cm, px, py;
@@ -412,14 +412,14 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
                             }
                             // add child's contribution
                             cm += m;
-                            px += posxd[ch] * m;
-                            py += posyd[ch] * m;
+                            px += posd[ch].x * m;
+                            py += posd[ch].y * m;
                         }
                     }
                     countd[k] = cnt;
                     m = 1.0f / cm;
-                    posxd[k] = px * m;
-                    posyd[k] = py * m;
+                    posd[k].x = px * m;
+                    posd[k].y = py * m;
                     __threadfence();  // make sure data are visible before setting mass
                     massd[k] = cm;
                 }
@@ -481,14 +481,14 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
                         }
                         // add child's contribution
                         cm += m;
-                        px += posxd[ch] * m;
-                        py += posyd[ch] * m;
+                        px += posd[ch].x * m;
+                        py += posd[ch].y * m;
                     }
                 }
                 countd[k] = cnt;
                 m = 1.0f / cm;
-                posxd[k] = px * m;
-                posyd[k] = py * m;
+                posd[k].x = px * m;
+                posd[k].y = py * m;
                 flag = 1;
             }
         }
@@ -564,7 +564,7 @@ __global__
 __launch_bounds__(THREADS5, FACTOR5)
 void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epssqd,
                             volatile int * __restrict sortd, volatile int * __restrict childd, volatile float * __restrict massd,
-                            volatile float * __restrict posxd, volatile float * __restrict posyd,
+                            volatile float2 * __restrict posd,
                             volatile float * __restrict fxd, volatile float * __restrict fyd, const float k_rd)
 {
     register int i, j, k, n, depth, base, sbase, diff, pd, nd;
@@ -607,8 +607,8 @@ void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epss
         {
             i = sortd[k];  // get permuted/sorted
             // cache position info
-            px = posxd[i];
-            py = posyd[i];
+            px = posd[i].x;
+            py = posd[i].y;
 
             ax = 0.0f;
             ay = 0.0f;
@@ -634,8 +634,8 @@ void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epss
 
                     if (n >= 0)
                     {
-                        dx = px - posxd[n];
-                        dy = py - posyd[n];
+                        dx = px - posd[n].x;
+                        dy = py - posd[n].y;
                         tmp = dx*dx + dy*dy + epssqd;  // compute distance squared (plus softening)
 
                         // check if all threads agree that cell is far enough away (or is a body)
