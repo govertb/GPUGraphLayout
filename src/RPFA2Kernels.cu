@@ -35,7 +35,7 @@ static __device__ unsigned int blkcntd_speed_kernel = 0;
 __global__
 __launch_bounds__(THREADS6, FACTOR6)
 void GravityKernel(int nbodiesd, const float k_g, const bool strong_gravity,
-                   volatile float * __restrict massd,
+                   volatile float * __restrict body_massd,
                    volatile float2 * __restrict body_posd,
                    volatile float * __restrict fxd, volatile float * __restrict fyd)
 {
@@ -52,13 +52,13 @@ void GravityKernel(int nbodiesd, const float k_g, const bool strong_gravity,
         float f_g;
         if(strong_gravity)
         {
-            f_g = k_g * massd[i];
+            f_g = k_g * body_massd[i];
         }
         else // weak gravity
         {
             if (px != 0.0 || py != 0.0)
             {
-                f_g = k_g * massd[i] * rsqrtf(px*px + py*py);
+                f_g = k_g * body_massd[i] * rsqrtf(px*px + py*py);
             }
 
             else
@@ -76,7 +76,6 @@ __global__
 __launch_bounds__(THREADS6, FACTOR6)
 void AttractiveForceKernel(int nedgesd,
                            volatile float2 * __restrict body_posd,
-                           volatile float * __restrict massd,
                            volatile float * __restrict fxd, volatile float * __restrict fyd,
                            volatile int * __restrict sourcesd, volatile int * __restrict targetsd)
 {
@@ -114,7 +113,7 @@ __launch_bounds__(THREADS1, FACTOR1)
 void SpeedKernel(int nbodiesd,
                  volatile float * __restrict fxd , volatile float * __restrict fyd,
                  volatile float * __restrict fx_prevd , volatile float * __restrict fy_prevd,
-                 volatile float * __restrict massd, volatile float * __restrict swgd, volatile float * __restrict etrad)
+                 volatile float * __restrict body_massd, volatile float * __restrict swgd, volatile float * __restrict etrad)
 {
     register int i, j, k, inc;
     register float swg_thread, swg_body, etra_thread, etra_body, dx, dy, mass;
@@ -132,7 +131,7 @@ void SpeedKernel(int nbodiesd,
 
     for (j = i + blockIdx.x * THREADS1; j < nbodiesd; j += inc)
     {
-        mass = massd[j];
+        mass = body_massd[j];
 
         dx = fxd[j] - fx_prevd[j];
         dy = fyd[j] - fy_prevd[j];

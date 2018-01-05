@@ -50,7 +50,7 @@ namespace RPGraph
         nedges  = layout.graph.num_edges();
 
         body_pos = (float2 *)malloc(sizeof(float2) * layout.graph.num_nodes());
-        mass     = (float *)malloc(sizeof(float) * layout.graph.num_nodes());
+        body_mass = (float *)malloc(sizeof(float) * layout.graph.num_nodes());
         sources  = (int *)  malloc(sizeof(int)   * layout.graph.num_edges());
         targets  = (int *)  malloc(sizeof(int)   * layout.graph.num_edges());
         fx       = (float *)malloc(sizeof(float) * layout.graph.num_nodes());
@@ -61,7 +61,7 @@ namespace RPGraph
         for (nid_t n = 0; n < layout.graph.num_nodes(); ++n)
         {
             body_pos[n] = {layout.getX(n), layout.getY(n)};
-            mass[n] = ForceAtlas2::mass(n);
+            body_mass[n] = ForceAtlas2::mass(n);
             fx[n] = 0.0;
             fy[n] = 0.0;
             fx_prev[n] = 0.0;
@@ -118,7 +118,8 @@ namespace RPGraph
         cudaCatchError(cudaMalloc((void **)&childl,  sizeof(int)   * (nnodes+1) * 4));
 
         // the following properties, for each node in the quadtree (both internal and leaf)
-        cudaCatchError(cudaMalloc((void **)&massl,   sizeof(float) * (nnodes+1)));
+        cudaCatchError(cudaMalloc((void **)&body_massl,   sizeof(float) * nbodies));
+        cudaCatchError(cudaMalloc((void **)&node_massl,   sizeof(float) * (nnodes+1)));
         cudaCatchError(cudaMalloc((void **)&body_posl,sizeof(float2) * nbodies));
         cudaCatchError(cudaMalloc((void **)&node_posl,    sizeof(float2) * (nnodes+1)));
         // count contains the number of nested nodes for each node in quadtree
@@ -146,7 +147,7 @@ namespace RPGraph
         cudaCatchError(cudaMalloc((void **)&etral,   sizeof(float) * mp_count * FACTOR6));
 
         // Copy host data to device.
-        cudaCatchError(cudaMemcpy(massl, mass, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
+        cudaCatchError(cudaMemcpy(body_massl, body_mass, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
         cudaCatchError(cudaMemcpy(body_posl,  body_pos,  sizeof(float2) * nbodies, cudaMemcpyHostToDevice));
         cudaCatchError(cudaMemcpy(sourcesl, sources, sizeof(int) * nedges, cudaMemcpyHostToDevice));
         cudaCatchError(cudaMemcpy(targetsl, targets, sizeof(int) * nedges, cudaMemcpyHostToDevice));
@@ -162,7 +163,8 @@ namespace RPGraph
     {
         cudaFree(childl);
 
-        cudaFree(massl);
+        cudaFree(body_massl);
+        cudaFree(node_massl);
         cudaFree(body_posl);
         cudaFree(node_posl);
         cudaFree(sourcesl);
@@ -187,7 +189,7 @@ namespace RPGraph
 
     CUDAForceAtlas2::~CUDAForceAtlas2()
     {
-        free(mass);
+        free(body_mass);
         free(body_pos);
         free(sources);
         free(targets);
@@ -219,19 +221,19 @@ namespace RPGraph
         for (int i = 0; i < num_reps; ++i)
         {
             cudaEventRecord(start, 0);
-            GravityKernel<<<mp_count * FACTOR6, THREADS6>>>(nbodies, k_g, strong_gravity, massl, body_posl, fxl, fyl);
+            GravityKernel<<<mp_count * FACTOR6, THREADS6>>>(nbodies, k_g, strong_gravity, body_massl, body_posl, fxl, fyl);
             cudaEventRecord(stop); cudaEventSynchronize(stop); cudaEventElapsedTime(&time, start, stop);
             times[0] += time;
             cudaCatchError(cudaGetLastError());
 
             cudaEventRecord(start, 0);
-            AttractiveForceKernel<<<mp_count * FACTOR6, THREADS6>>>(nedges, body_posl, massl, fxl, fyl, sourcesl, targetsl);
+            AttractiveForceKernel<<<mp_count * FACTOR6, THREADS6>>>(nedges, body_posl, fxl, fyl, sourcesl, targetsl);
             cudaEventRecord(stop); cudaEventSynchronize(stop); cudaEventElapsedTime(&time, start, stop);
             times[1] += time;
             cudaCatchError(cudaGetLastError());
 
             cudaEventRecord(start, 0);
-            BoundingBoxKernel<<<mp_count * FACTOR1, THREADS1>>>(nnodes, nbodies, startl, childl, massl, body_posl, node_posl, maxxl, maxyl, minxl, minyl);
+            BoundingBoxKernel<<<mp_count * FACTOR1, THREADS1>>>(nnodes, nbodies, startl, childl, node_massl, body_posl, node_posl, maxxl, maxyl, minxl, minyl);
             cudaEventRecord(stop); cudaEventSynchronize(stop); cudaEventElapsedTime(&time, start, stop);
             times[2] += time;
             cudaCatchError(cudaGetLastError());
@@ -249,13 +251,13 @@ namespace RPGraph
             cudaCatchError(cudaGetLastError());
 
             cudaEventRecord(start, 0);
-            ClearKernel2<<<1024, 1>>>(nnodes, startl, massl);
+            ClearKernel2<<<1024, 1>>>(nnodes, startl, node_massl);
             cudaEventRecord(stop); cudaEventSynchronize(stop); cudaEventElapsedTime(&time, start, stop);
             times[5] += time;
             cudaCatchError(cudaGetLastError());
 
             cudaEventRecord(start, 0);
-            SummarizationKernel<<<mp_count * FACTOR3, THREADS3>>>(nnodes, nbodies, countl, childl, massl, body_posl, node_posl);
+            SummarizationKernel<<<mp_count * FACTOR3, THREADS3>>>(nnodes, nbodies, countl, childl, body_massl, node_massl, body_posl, node_posl);
             cudaEventRecord(stop); cudaEventSynchronize(stop); cudaEventElapsedTime(&time, start, stop);
             times[6] += time;
             cudaCatchError(cudaGetLastError());
@@ -269,13 +271,13 @@ namespace RPGraph
             float epssq  = 0.05 * 0.05;            // Some sort of softening (eps, squared)
             float itolsq = 1.0f / (theta * theta); // Inverse tolerance, squared
             cudaEventRecord(start, 0);
-            ForceCalculationKernel<<<mp_count * FACTOR5, THREADS5>>>(nnodes, nbodies, itolsq, epssq, sortl, childl, massl, body_posl, node_posl, fxl, fyl, k_r);
+            ForceCalculationKernel<<<mp_count * FACTOR5, THREADS5>>>(nnodes, nbodies, itolsq, epssq, sortl, childl, body_massl, node_massl, body_posl, node_posl, fxl, fyl, k_r);
             cudaEventRecord(stop); cudaEventSynchronize(stop); cudaEventElapsedTime(&time, start, stop);
             times[8] += time;
             cudaCatchError(cudaGetLastError());
 
             cudaEventRecord(start, 0);
-            SpeedKernel<<<mp_count * FACTOR1, THREADS1>>>(nbodies, fxl, fyl, fx_prevl, fy_prevl, massl, swgl, etral);
+            SpeedKernel<<<mp_count * FACTOR1, THREADS1>>>(nbodies, fxl, fyl, fx_prevl, fy_prevl, body_massl, swgl, etral);
             cudaEventRecord(stop); cudaEventSynchronize(stop); cudaEventElapsedTime(&time, start, stop);
             times[9] += time;
             cudaCatchError(cudaGetLastError());
@@ -308,11 +310,11 @@ namespace RPGraph
     {
         int err = 0;
 
-        GravityKernel<<<mp_count * FACTOR6, THREADS6>>>(nbodies, k_g, strong_gravity, massl, body_posl, fxl, fyl);
+        GravityKernel<<<mp_count * FACTOR6, THREADS6>>>(nbodies, k_g, strong_gravity, body_massl, body_posl, fxl, fyl);
 
-        AttractiveForceKernel<<<mp_count * FACTOR6, THREADS6>>>(nedges, body_posl, massl, fxl, fyl, sourcesl, targetsl);
+        AttractiveForceKernel<<<mp_count * FACTOR6, THREADS6>>>(nedges, body_posl, fxl, fyl, sourcesl, targetsl);
 
-        BoundingBoxKernel<<<mp_count * FACTOR1, THREADS1>>>(nnodes, nbodies, startl, childl, massl, body_posl, node_posl, maxxl, maxyl, minxl, minyl);
+        BoundingBoxKernel<<<mp_count * FACTOR1, THREADS1>>>(nnodes, nbodies, startl, childl, node_massl, body_posl, node_posl, maxxl, maxyl, minxl, minyl);
 
         // Build Barnes-Hut Tree
         // 1.) Set all child pointers of internal nodes (in childl) to null (-1)
@@ -329,17 +331,17 @@ namespace RPGraph
         }
 
         // 3.) Set all cell mass values to -1.0, set all startd to null (-1)
-        ClearKernel2<<<mp_count, 1024>>>(nnodes, startl, massl);
+        ClearKernel2<<<mp_count, 1024>>>(nnodes, startl, node_massl);
 
         // Recursively compute mass for each BH. cell.
-        SummarizationKernel<<<mp_count * FACTOR3, THREADS3>>>(nnodes, nbodies, countl, childl, massl, body_posl, node_posl);
+        SummarizationKernel<<<mp_count * FACTOR3, THREADS3>>>(nnodes, nbodies, countl, childl, body_massl, node_massl, body_posl, node_posl);
 
         SortKernel<<<mp_count * FACTOR4, THREADS4>>>(nnodes, nbodies, sortl, countl, startl, childl);
 
         // Compute repulsive forces between nodes using BH. tree.
         float epssq  = 0.05 * 0.05;            // Some sort of softening (eps, squared)
         float itolsq = 1.0f / (theta * theta); // Inverse tolerance, squared
-        ForceCalculationKernel<<<mp_count * FACTOR5, THREADS5>>>(nnodes, nbodies, itolsq, epssq, sortl, childl, massl, body_posl, node_posl, fxl, fyl, k_r);
+        ForceCalculationKernel<<<mp_count * FACTOR5, THREADS5>>>(nnodes, nbodies, itolsq, epssq, sortl, childl, body_massl, node_massl, body_posl, node_posl, fxl, fyl, k_r);
 
         cudaDeviceSynchronize();
         cudaCatchError(cudaMemcpyFromSymbol(&err, errd, sizeof(int), 0, cudaMemcpyDeviceToHost));
@@ -349,8 +351,7 @@ namespace RPGraph
             exit(EXIT_FAILURE);
         }
 
-
-        SpeedKernel<<<mp_count * FACTOR1, THREADS1>>>(nbodies, fxl, fyl, fx_prevl, fy_prevl, massl, swgl, etral);
+        SpeedKernel<<<mp_count * FACTOR1, THREADS1>>>(nbodies, fxl, fyl, fx_prevl, fy_prevl, body_massl, swgl, etral);
 
         DisplacementKernel<<<mp_count * FACTOR6, THREADS6>>>(nbodies, body_posl, fxl, fyl, fx_prevl, fy_prevl);
 
@@ -371,7 +372,7 @@ namespace RPGraph
 
     void CUDAForceAtlas2::sendGraphToGPU()
     {
-        cudaCatchError(cudaMemcpy(massl, mass, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
+        cudaCatchError(cudaMemcpy(body_massl, body_mass, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
         cudaCatchError(cudaMemcpy(sourcesl, sources, sizeof(int) * nedges, cudaMemcpyHostToDevice));
         cudaCatchError(cudaMemcpy(targetsl, targets, sizeof(int) * nedges, cudaMemcpyHostToDevice));
         cudaDeviceSynchronize();

@@ -57,7 +57,7 @@ extern __device__ float minxdg, minydg, maxxdg, maxydg;
 __global__
 __launch_bounds__(THREADS1, FACTOR1)
 void BoundingBoxKernel(int nnodesd, int nbodiesd, volatile int * __restrict startd,
-                       volatile int   * __restrict childd, volatile float * __restrict massd,
+                       volatile int   * __restrict childd, volatile float * __restrict node_massd,
                        volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd,
                        volatile float * __restrict maxxd,  volatile float * __restrict maxyd,
                        volatile float * __restrict minxd,  volatile float * __restrict minyd);
@@ -73,12 +73,12 @@ void TreeBuildingKernel(int nnodesd, int nbodiesd, volatile int * __restrict chi
 
 __global__
 __launch_bounds__(1024, 1)
-void ClearKernel2(int nnodesd, volatile int * __restrict startd, volatile float * __restrict massd);
+void ClearKernel2(int nnodesd, volatile int * __restrict startd, volatile float * __restrict node_massd);
 
 __global__
 __launch_bounds__(THREADS3, FACTOR3)
 void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * __restrict countd, const int * __restrict childd,
-                         volatile float * __restrict massd, volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd);
+                         volatile float * __restrict body_massd, volatile float * __restrict node_massd, volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd);
 
 __global__
 __launch_bounds__(THREADS4, FACTOR4)
@@ -87,7 +87,8 @@ void SortKernel(int nnodesd, int nbodiesd, int * __restrict sortd, int * __restr
 __global__
 __launch_bounds__(THREADS5, FACTOR5)
 void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epssqd,
-                            volatile int * __restrict sortd, volatile int * __restrict childd, volatile float * __restrict massd,
+                            volatile int * __restrict sortd, volatile int * __restrict childd, 
+                            volatile float * __restrict body_massd, volatile float * __restrict node_massd, 
                             volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd,
                             volatile float * __restrict fxd, volatile float * __restrict fyd, const float k_rd);
 

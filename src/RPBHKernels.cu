@@ -70,7 +70,7 @@ static __device__ volatile float radiusd;
 __global__
 __launch_bounds__(THREADS1, FACTOR1)
 void BoundingBoxKernel(int nnodesd, int nbodiesd, volatile int * __restrict startd,
-                       volatile int   * __restrict childd, volatile float * __restrict massd,
+                       volatile int   * __restrict childd, volatile float * __restrict node_massd,
                        volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd,
                        volatile float * __restrict maxxd,  volatile float * __restrict maxyd,
                        volatile float * __restrict minxd,  volatile float * __restrict minyd)
@@ -143,7 +143,7 @@ void BoundingBoxKernel(int nnodesd, int nbodiesd, volatile int * __restrict star
             k = nnodesd;
             bottomd = k;
 
-            massd[k] = -1.0f;
+            node_massd[k] = -1.0f;
             node_posd[k].x = (minx + maxx) * 0.5f;
             node_posd[k].y = (miny + maxy) * 0.5f;
             startd[k] = 0;
@@ -336,7 +336,7 @@ void TreeBuildingKernel(int nnodesd, int nbodiesd, volatile int * __restrict chi
 // Sets mass of cells to -1.0, and all startd entries to null (-1).
 __global__
 __launch_bounds__(1024, 1)
-void ClearKernel2(int nnodesd, volatile int * __restrict startd, volatile float * __restrict massd)
+void ClearKernel2(int nnodesd, volatile int * __restrict startd, volatile float * __restrict node_massd)
 {
     register int k, inc, bottom;
 
@@ -348,7 +348,7 @@ void ClearKernel2(int nnodesd, volatile int * __restrict startd, volatile float 
     // iterate over all cells assigned to thread, skip root cell.
     while (k < nnodesd)
     {
-        massd[k] = -1.0f;
+        node_massd[k] = -1.0f;
         startd[k] = -1;
         k += inc;
     }
@@ -362,7 +362,7 @@ void ClearKernel2(int nnodesd, volatile int * __restrict startd, volatile float 
 __global__
 __launch_bounds__(THREADS3, FACTOR3)
 void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * __restrict countd, const int * __restrict childd,
-                         volatile float * __restrict massd, volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd)
+                         volatile float * __restrict body_massd, volatile float * __restrict node_massd, volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd)
 {
     register int i, j, k, ch, inc, cnt, bottom, flag;
     register float m, cm, px, py;
@@ -380,13 +380,13 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
         // iterate over all cells assigned to thread
         while (k <= nnodesd)
         {
-            if (massd[k] < 0.0f)
+            if (node_massd[k] < 0.0f)
             {
                 for (i = 0; i < 4; i++)
                 {
                     ch = childd[k*4+i];
                     child[i*THREADS3+threadIdx.x] = ch;  // cache children
-                    if ((ch >= nbodiesd) && ((mass[i*THREADS3+threadIdx.x] = massd[ch]) < 0.0f)) break;
+                    if ((ch >= nbodiesd) && ((mass[i*THREADS3+threadIdx.x] = node_massd[ch]) < 0.0f)) break;
                 }
                 if (i == 4)
                 {
@@ -409,7 +409,7 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
                             }
                             else
                             {
-                                m = massd[ch];
+                                m = body_massd[ch];
                                 cnt++;
                                 px += body_posd[ch].x * m;
                                 py += body_posd[ch].y * m;
@@ -423,7 +423,7 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
                     node_posd[k].x = px * m;
                     node_posd[k].y = py * m;
                     __threadfence();  // make sure data are visible before setting mass
-                    massd[k] = cm;
+                    node_massd[k] = cm;
                 }
             }
             k += inc;  // move on to next cell
@@ -436,7 +436,11 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
     // iterate over all cells assigned to thread
     while (k <= nnodesd)
     {
-        if (massd[k] >= 0.0f) k += inc;
+        if (k < nbodiesd and body_massd[k] >= 0.0f)
+            k += inc;
+        else if(k >= nbodiesd and node_massd[k] >= 0.0f)
+            k += inc;
+        
         else
         {
             if (j == 0)
@@ -446,7 +450,7 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
                 {
                     ch = childd[k*4+i];
                     child[i*THREADS3+threadIdx.x] = ch;  // cache children
-                    if ((ch < nbodiesd) || ((mass[i*THREADS3+threadIdx.x] = massd[ch]) >= 0.0f)) j--;
+                    if ((ch < nbodiesd) || ((mass[i*THREADS3+threadIdx.x] = node_massd[ch]) >= 0.0f)) j--;
                 }
             }
             else
@@ -455,7 +459,7 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
                 for (i = 0; i < 4; i++)
                 {
                     ch = child[i*THREADS3+threadIdx.x];
-                    if ((ch < nbodiesd) || (mass[i*THREADS3+threadIdx.x] >= 0.0f) || ((mass[i*THREADS3+threadIdx.x] = massd[ch]) >= 0.0f)) j--;
+                    if ((ch < nbodiesd) || (mass[i*THREADS3+threadIdx.x] >= 0.0f) || ((mass[i*THREADS3+threadIdx.x] = node_massd[ch]) >= 0.0f)) j--;
                 }
             }
 
@@ -480,7 +484,7 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
                         }
                         else
                         {
-                            m = massd[ch];
+                            m = body_massd[ch];
                             cnt++;
                             px += body_posd[ch].x * m;
                             py += body_posd[ch].y * m;
@@ -499,7 +503,7 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
         __syncthreads();  // __threadfence();
         if (flag != 0)
         {
-            massd[k] = cm;
+            k < nbodiesd ? body_massd[k] = cm : node_massd[k] = cm;
             k += inc;
             flag = 0;
         }
@@ -567,7 +571,8 @@ void SortKernel(int nnodesd, int nbodiesd, int * __restrict sortd, int * __restr
 __global__
 __launch_bounds__(THREADS5, FACTOR5)
 void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epssqd,
-                            volatile int * __restrict sortd, volatile int * __restrict childd, volatile float * __restrict massd,
+                            volatile int * __restrict sortd, volatile int * __restrict childd, 
+                            volatile float * __restrict body_massd, volatile float * __restrict node_massd,
                             volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd,
                             volatile float * __restrict fxd, volatile float * __restrict fyd, const float k_rd)
 {
@@ -650,11 +655,18 @@ void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epss
                         }
                         tmp = dx*dx + dy*dy + epssqd;  // compute distance squared (plus softening)
 
-                        // check if all threads agree that cell is far enough away (or is a body)
-                        if ((n < nbodiesd) || __all(tmp >= dq[depth]))
+                        // check body-body interaction
+                        if (n < nbodiesd)
                         {
-                            ax += k_rd * dx * massd[i] * massd[n] / tmp;
-                            ay += k_rd * dy * massd[i] * massd[n] / tmp;
+                            ax += k_rd * dx * body_massd[i] * body_massd[n] / tmp;
+                            ay += k_rd * dy * body_massd[i] * body_massd[n] / tmp;
+                        }
+                        
+                        // or, if n is cell, ensure all threads agree that cell is far enough away
+                        else if(__all(tmp >= dq[depth]))
+                        {
+                            ax += k_rd * dx * body_massd[i] * node_massd[n] / tmp;
+                            ay += k_rd * dy * body_massd[i] * node_massd[n] / tmp;
                         }
                         else
                         {
