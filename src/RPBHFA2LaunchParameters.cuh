@@ -1,5 +1,5 @@
 /// Per kernel launch configuration parameters
-// 1: BoundingBoxKernel, SpeedKernel, ComputeLayoutDimensions (reductions of size |V|)
+// 1: BoundingBoxKernel, SpeedKernel (reductions of size |V|)
 // 2: TreeBuild
 // 3: Summurization
 // 4: SortKernel

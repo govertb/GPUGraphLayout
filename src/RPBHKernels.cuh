@@ -91,10 +91,4 @@ void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epss
                             volatile float * __restrict posxd, volatile float * __restrict posyd,
                             volatile float * __restrict fxd, volatile float * __restrict fyd, const float k_rd);
 
-__global__
-__launch_bounds__(THREADS1, FACTOR1)
-void ComputeLayoutDimensions(int nbodiesd,
-                             volatile float * __restrict posxd,  volatile float * __restrict posyd,
-                             volatile float * __restrict maxxd,  volatile float * __restrict maxyd,
-                             volatile float * __restrict minxd,  volatile float * __restrict minyd);
 #endif
