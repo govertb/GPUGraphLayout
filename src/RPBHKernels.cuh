@@ -58,7 +58,7 @@ __global__
 __launch_bounds__(THREADS1, FACTOR1)
 void BoundingBoxKernel(int nnodesd, int nbodiesd, volatile int * __restrict startd,
                        volatile int   * __restrict childd, volatile float * __restrict massd,
-                       volatile float2 * __restrict posd,
+                       volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd,
                        volatile float * __restrict maxxd,  volatile float * __restrict maxyd,
                        volatile float * __restrict minxd,  volatile float * __restrict minyd);
 
@@ -69,7 +69,7 @@ void ClearKernel1(int nnodesd, int nbodiesd, volatile int * __restrict childd);
 __global__
 __launch_bounds__(THREADS2, FACTOR2)
 void TreeBuildingKernel(int nnodesd, int nbodiesd, volatile int * __restrict childd,
-                        volatile float2 * __restrict posd);
+                        volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd);
 
 __global__
 __launch_bounds__(1024, 1)
@@ -78,7 +78,7 @@ void ClearKernel2(int nnodesd, volatile int * __restrict startd, volatile float 
 __global__
 __launch_bounds__(THREADS3, FACTOR3)
 void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * __restrict countd, const int * __restrict childd,
-                         volatile float * __restrict massd, volatile float2 * __restrict posd);
+                         volatile float * __restrict massd, volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd);
 
 __global__
 __launch_bounds__(THREADS4, FACTOR4)
@@ -88,7 +88,7 @@ __global__
 __launch_bounds__(THREADS5, FACTOR5)
 void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epssqd,
                             volatile int * __restrict sortd, volatile int * __restrict childd, volatile float * __restrict massd,
-                            volatile float2 * __restrict posd,
+                            volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd,
                             volatile float * __restrict fxd, volatile float * __restrict fyd, const float k_rd);
 
 #endif

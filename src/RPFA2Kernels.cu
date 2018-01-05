@@ -36,7 +36,7 @@ __global__
 __launch_bounds__(THREADS6, FACTOR6)
 void GravityKernel(int nbodiesd, const float k_g, const bool strong_gravity,
                    volatile float * __restrict massd,
-                   volatile float2 * __restrict posd,
+                   volatile float2 * __restrict body_posd,
                    volatile float * __restrict fxd, volatile float * __restrict fyd)
 {
     register int i, inc;
@@ -45,8 +45,8 @@ void GravityKernel(int nbodiesd, const float k_g, const bool strong_gravity,
     inc = blockDim.x * gridDim.x;
     for (i = threadIdx.x + blockIdx.x * blockDim.x; i < nbodiesd; i += inc)
     {
-        const float px = posd[i].x;
-        const float py = posd[i].y;
+        const float px = body_posd[i].x;
+        const float py = body_posd[i].y;
 
         // `f_g' is the magnitude of gravitational force
         float f_g;
@@ -75,7 +75,7 @@ void GravityKernel(int nbodiesd, const float k_g, const bool strong_gravity,
 __global__
 __launch_bounds__(THREADS6, FACTOR6)
 void AttractiveForceKernel(int nedgesd,
-                           volatile float2 * __restrict posd,
+                           volatile float2 * __restrict body_posd,
                            volatile float * __restrict massd,
                            volatile float * __restrict fxd, volatile float * __restrict fyd,
                            volatile int * __restrict sourcesd, volatile int * __restrict targetsd)
@@ -89,8 +89,8 @@ void AttractiveForceKernel(int nedgesd,
         target = targetsd[i];
 
         // dx and dy are distance to between the neighbors.
-        const float dx = posd[target].x-posd[source].x;
-        const float dy = posd[target].y-posd[source].y;
+        const float dx = body_posd[target].x-body_posd[source].x;
+        const float dy = body_posd[target].y-body_posd[source].y;
 
         // Force just depends linearly on distance.
         const float fsx = dx;
@@ -224,7 +224,7 @@ void SpeedKernel(int nbodiesd,
 __global__
 __launch_bounds__(THREADS6, FACTOR6)
 void DisplacementKernel(int nbodiesd,
-                       volatile float2 * __restrict posd,
+                       volatile float2 * __restrict body_posd,
                        volatile float * __restrict fxd, volatile float * __restrict fyd,
                        volatile float * __restrict fx_prevd, volatile float * __restrict fy_prevd)
 {
@@ -242,8 +242,8 @@ void DisplacementKernel(int nbodiesd,
         swg = sqrtf(dx*dx + dy*dy);
         factor = global_speed / (1.0 + sqrtf(global_speed * swg));
 
-        posd[i].x += fx * factor;
-        posd[i].y += fy * factor;
+        body_posd[i].x += fx * factor;
+        body_posd[i].y += fy * factor;
         fx_prevd[i] = fx;
         fy_prevd[i] = fy;
         fxd[i] = 0.0;

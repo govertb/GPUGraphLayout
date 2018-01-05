@@ -40,7 +40,7 @@ namespace RPGraph
         /// CUDA Specific stuff.
         // Host storage.
         float *mass;
-        float2 *pos;
+        float2 *body_pos;
         float *fx, *fy, *fx_prev, *fy_prev;
 
         // Quick way to represent a graph on the GPU
@@ -50,7 +50,7 @@ namespace RPGraph
         int   *errl,  *sortl, *childl, *countl, *startl;
         int   *sourcesl, *targetsl;
         float *massl;
-        float2 *posl;
+        float2 *body_posl, *node_posl;
         float *minxl, *minyl, *maxxl, *maxyl;
         float *fxl, *fyl, *fx_prevl, *fy_prevl;
         float *swgl, *etral;

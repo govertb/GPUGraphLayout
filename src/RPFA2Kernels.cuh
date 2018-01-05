@@ -30,13 +30,13 @@ __global__
 __launch_bounds__(THREADS6, FACTOR6)
 void GravityKernel(int nbodiesd, const float k_g, const bool strong_gravity,
                    volatile float * __restrict massd,
-                   volatile float2 * __restrict posd,
+                   volatile float2 * __restrict body_posd,
                    volatile float * __restrict fxd, volatile float * __restrict fyd);
 
 __global__
 __launch_bounds__(THREADS6, FACTOR6)
 void AttractiveForceKernel(int nedgesd,
-                           volatile float2 * __restrict posd,
+                           volatile float2 * __restrict body_posd,
                            volatile float * __restrict massd,
                            volatile float * __restrict fxd, volatile float * __restrict fyd,
                            volatile int * __restrict sourcesd, volatile int * __restrict targetsd);
@@ -51,7 +51,7 @@ void SpeedKernel(int nbodiesd,
 __global__
 __launch_bounds__(THREADS6, FACTOR6)
 void DisplacementKernel(int nbodiesd,
-                       volatile float2 * __restrict posd,
+                       volatile float2 * __restrict body_posd,
                        volatile float * __restrict fxd, volatile float * __restrict fyd,
                        volatile float * __restrict fx_prevd, volatile float * __restrict fy_prevd);
 
