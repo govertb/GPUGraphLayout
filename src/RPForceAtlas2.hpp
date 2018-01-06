@@ -2,7 +2,7 @@
  ==============================================================================
 
  RPForceAtlas2.hpp
- Copyright (C) 2016, 2017  G. Brinkmann
+ Copyright © 2016, 2017, 2018  G. Brinkmann
 
  This file is part of graph_viewer.
 
