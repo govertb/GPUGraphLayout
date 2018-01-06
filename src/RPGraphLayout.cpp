@@ -27,6 +27,7 @@
 
 #include <fstream>
 #include <cmath>
+#include <limits>
 
 namespace RPGraph
 {
