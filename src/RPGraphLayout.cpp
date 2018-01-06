@@ -62,7 +62,7 @@ namespace RPGraph
 
     float GraphLayout::minX()
     {
-        float minX = INFINITY;
+        float minX = std::numeric_limits<float>::max();
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
             if (getX(n) < minX) minX = getX(n);
         return minX;
@@ -70,7 +70,7 @@ namespace RPGraph
 
     float GraphLayout::maxX()
     {
-        float maxX = -INFINITY;
+        float maxX = std::numeric_limits<float>::min();
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
             if (getX(n) > maxX) maxX = getX(n);
         return maxX;
@@ -78,7 +78,7 @@ namespace RPGraph
 
     float GraphLayout::minY()
     {
-        float minY = INFINITY;
+        float minY = std::numeric_limits<float>::max();
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
             if (getY(n) < minY) minY = getY(n);
         return minY;
@@ -86,7 +86,7 @@ namespace RPGraph
 
     float GraphLayout::maxY()
     {
-        float maxY = -INFINITY;
+        float maxY = std::numeric_limits<float>::min();
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
             if (getY(n) > maxY) maxY = getY(n);
         return maxY;
