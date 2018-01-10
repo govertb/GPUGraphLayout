@@ -143,8 +143,8 @@ namespace RPGraph
         cudaCatchError(cudaMalloc((void **)&minyl,   sizeof(float) * mp_count * FACTOR1));
 
         // Used for reduction in SpeedKernel
-        cudaCatchError(cudaMalloc((void **)&swgl,    sizeof(float) * mp_count * FACTOR6));
-        cudaCatchError(cudaMalloc((void **)&etral,   sizeof(float) * mp_count * FACTOR6));
+        cudaCatchError(cudaMalloc((void **)&swgl,    sizeof(float) * mp_count * FACTOR1));
+        cudaCatchError(cudaMalloc((void **)&etral,   sizeof(float) * mp_count * FACTOR1));
 
         // Copy host data to device.
         cudaCatchError(cudaMemcpy(body_massl, body_mass, sizeof(float) * nbodies, cudaMemcpyHostToDevice));
