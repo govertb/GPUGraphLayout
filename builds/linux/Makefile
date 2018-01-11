@@ -26,7 +26,7 @@ CPPFLAGS :=-D NO_FREETYPE
 
 # C/C++ compiler flags
 CFLAGS   :=$(O_LVL)
-CXXFLAGS :=$(O_LVL) -std=c++11
+CXXFLAGS :=$(CXXFLAGS) $(O_LVL) -std=c++11
 
 # Linker flags
 LDFLAGS  :=-lc -lm -lstdc++ -lpng
