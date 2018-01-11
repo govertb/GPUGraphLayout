@@ -270,8 +270,8 @@ void TreeBuildingKernel(int nnodesd, int nbodiesd, volatile int * __restrict chi
                     // and redo traversal
                     if (body_posd[ch].x == px && body_posd[ch].y == py)
                     {
-                        body_posd[i].x += .1;
-                        body_posd[i].y += .1;
+                        body_posd[i].x *= .99;
+                        body_posd[i].y *= .99;
                         skip = 0; // start all over
                         childd[locked] = ch; // release lock
                         break;
