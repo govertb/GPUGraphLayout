@@ -32,7 +32,6 @@ namespace RPGraph
     public:
         CUDAForceAtlas2(GraphLayout &layout);
         ~CUDAForceAtlas2();
-        void benchmark() override;
         void doStep() override;
         void sync_layout() override;
 

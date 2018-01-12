@@ -211,109 +211,27 @@ namespace RPGraph
 
     void CPUForceAtlas2::doStep()
     {
-        auto starttime = std::chrono::high_resolution_clock::now();
-        auto endtime = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> runningtime;
-        std::chrono::microseconds runningtime_us;
-
-        starttime = std::chrono::high_resolution_clock::now();
         if (use_barneshut)
             BH_Approximator.rebuild();
-        endtime = std::chrono::high_resolution_clock::now();
-        runningtime = (endtime - starttime);
-        runningtime_us = std::chrono::duration_cast<std::chrono::microseconds>(runningtime);
-        //runningtimes[iteration][2] = runningtime_us.count();
 
-        starttime = std::chrono::high_resolution_clock::now();
-            for (nid_t n = 0; n < layout.graph.num_nodes(); ++n) apply_gravity(n);
-        endtime = std::chrono::high_resolution_clock::now();
-        runningtime = (endtime - starttime);
-        runningtime_us = std::chrono::duration_cast<std::chrono::microseconds>(runningtime);
-        //runningtimes[iteration][0] = runningtime_us.count();
+        for (nid_t n = 0; n < layout.graph.num_nodes(); ++n)
+        {
+            apply_gravity(n);
+            apply_attract(n);
+            apply_repulsion(n);
+        }
+        
+        updateSpeeds();
 
-        starttime = std::chrono::high_resolution_clock::now();
-            for (nid_t n = 0; n < layout.graph.num_nodes(); ++n)    apply_attract(n);
-        endtime = std::chrono::high_resolution_clock::now();
-        runningtime = (endtime - starttime);
-        runningtime_us = std::chrono::duration_cast<std::chrono::microseconds>(runningtime);
-        //runningtimes[iteration][1] = runningtime_us.count();
-
-        starttime = std::chrono::high_resolution_clock::now();
-            for (nid_t n = 0; n < layout.graph.num_nodes(); ++n)    apply_repulsion(n);
-        endtime = std::chrono::high_resolution_clock::now();
-        runningtime = (endtime - starttime);
-        runningtime_us = std::chrono::duration_cast<std::chrono::microseconds>(runningtime);
-        //runningtimes[iteration][3] = runningtime_us.count();
-
-
-        starttime = std::chrono::high_resolution_clock::now();
-            updateSpeeds();
-        endtime = std::chrono::high_resolution_clock::now();
-        runningtime = (endtime - starttime);
-        runningtime_us = std::chrono::duration_cast<std::chrono::microseconds>(runningtime);
-        //runningtimes[iteration][4] = runningtime_us.count();
-
-        starttime = std::chrono::high_resolution_clock::now();
         for (nid_t n = 0; n < layout.graph.num_nodes(); ++n)
         {
             apply_displacement(n);
             prev_forces[n]  = forces[n];
             forces[n]       = Real2DVector(0.0f, 0.0f);
         }
-        endtime = std::chrono::high_resolution_clock::now();
-        runningtime = (endtime - starttime);
-        runningtime_us = std::chrono::duration_cast<std::chrono::microseconds>(runningtime);
-        //runningtimes[iteration][5] = runningtime_us.count();
-
         iteration++;
     }
-    void CPUForceAtlas2::benchmark()
-    {
-        printf("Benchmarks:\n");
-        printf("Gravity ");
-        float total = 0, grandtotal = 0;
-        for (int i = 0; i < 10; ++i) total += runningtimes[i][0];
-        printf("%.4f", total/10.0);
-        printf("\n");
-
-        grandtotal += total;
-        total = 0;
-        printf("Attractive ");
-        for (int i = 0; i < 10; ++i) total += runningtimes[i][1];
-        printf("%.4f", total/10.0);
-        printf("\n");
-
-        grandtotal += total;
-        total = 0;
-        printf("Barnes-HutTreeBuild ");
-        for (int i = 0; i < 10; ++i) total += runningtimes[i][2];
-        printf("%.4f", total/10.0);
-        printf("\n");
-
-        grandtotal += total;
-        total = 0;
-        printf("Barnes-HutApproximation ");
-        for (int i = 0; i < 10; ++i) total += runningtimes[i][3];
-        printf("%.4f", total/10.0);
-        printf("\n");
-
-        grandtotal += total;
-        total = 0;
-        printf("Speed ");
-        for (int i = 0; i < 10; ++i) total += runningtimes[i][4];
-        printf("%.4f", total/10.0);
-        printf("\n");
-
-        grandtotal += total;
-        total = 0;
-        printf("Displacement ");
-        for (int i = 0; i < 10; ++i) total += runningtimes[i][5];
-        printf("%.4f", total/10.0);
-        printf("\n\n");
-        printf("Total ");
-        printf("%.4f", grandtotal/10.0);
-        printf("\n");
-    }
+    
     void CPUForceAtlas2::sync_layout() {}
 
 }

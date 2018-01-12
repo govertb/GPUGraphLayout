@@ -33,14 +33,12 @@ namespace RPGraph
     public:
         CPUForceAtlas2(GraphLayout &layout);
         ~CPUForceAtlas2();
-        void benchmark() override;
         void doStep() override;
         void sync_layout() override;
 
     private:
         Real2DVector *forces, *prev_forces;
         BarnesHutApproximator BH_Approximator;
-        float runningtimes[10][6] = {{5.5,},};
 
         float swg(nid_t n);            // swinging ..
         float s(nid_t n);              // swinging as well ..

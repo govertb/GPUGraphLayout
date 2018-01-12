@@ -36,7 +36,6 @@ namespace RPGraph
             ~ForceAtlas2();
             
             virtual void doStep() = 0;
-            virtual void benchmark() = 0;
             void doSteps(int n);
             void setScale(float s);
             void setGravity(float s);

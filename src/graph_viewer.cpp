@@ -50,9 +50,9 @@ int main(int argc, const char **argv)
     srandom(1234);
 
     // Parse commandline arguments
-    if (argc != 11)
+    if (argc != 10)
     {
-        fprintf(stderr, "Usage: graph_viewer cuda|seq max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path test|image\n");
+        fprintf(stderr, "Usage: graph_viewer cuda|seq max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path\n");
         exit(EXIT_FAILURE);
     }
 
@@ -65,7 +65,6 @@ int main(int argc, const char **argv)
     const bool approximate = std::string(argv[7]) == "approximate";
     const char *edgelist_path = argv[8];
     const char *out_path = argv[9];
-    const bool testmode = std::string(argv[10]) == "test";
     const int framesize = 10000;
     const float w = framesize;
     const float h = framesize;
@@ -119,39 +118,32 @@ int main(int argc, const char **argv)
     fa2->setScale(scale);
     fa2->setGravity(gravity);
 
-    if(testmode)
-    {
-        fa2->benchmark();
-        exit(EXIT_SUCCESS);
-    }
-    else
-    {
-        printf("Started Layout algorithm...\n");
-        const int snap_period = ceil((float)max_iterations/num_screenshots);
-        const int print_period = ceil((float)max_iterations*0.05);
+    printf("Started Layout algorithm...\n");
+    const int snap_period = ceil((float)max_iterations/num_screenshots);
+    const int print_period = ceil((float)max_iterations*0.05);
 
-        for (int iteration = 1; iteration <= max_iterations; ++iteration)
+    for (int iteration = 1; iteration <= max_iterations; ++iteration)
+    {
+        fa2->doStep();
+        // If we need to, write the result to a png
+        if (num_screenshots > 0 && (iteration % snap_period == 0 || iteration == max_iterations))
         {
-            fa2->doStep();
-            // If we need to, write the result to a png
-            if (num_screenshots > 0 && (iteration % snap_period == 0 || iteration == max_iterations))
-            {
-                std::string op(out_path);
-                op.append("/").append(std::to_string(iteration)).append(".png");
-                printf("Starting iteration %d (%.2f%%), writing png...", iteration, 100*(float)iteration/max_iterations);
-                fflush(stdout);
-                fa2->sync_layout();
-                layout.writeToPNG(framesize, framesize, op.c_str());
-                printf("done.\n");
-            }
+            std::string op(out_path);
+            op.append("/").append(std::to_string(iteration)).append(".png");
+            printf("Starting iteration %d (%.2f%%), writing png...", iteration, 100*(float)iteration/max_iterations);
+            fflush(stdout);
+            fa2->sync_layout();
+            layout.writeToPNG(framesize, framesize, op.c_str());
+            printf("done.\n");
+        }
 
-            // Else we print (if we need to)
-            else if (iteration % print_period == 0)
-            {
-                printf("Starting iteration %d (%.2f%%).\n", iteration, 100*(float)iteration/max_iterations);
-            }
+        // Else we print (if we need to)
+        else if (iteration % print_period == 0)
+        {
+            printf("Starting iteration %d (%.2f%%).\n", iteration, 100*(float)iteration/max_iterations);
         }
     }
+    
     delete fa2;
     exit(EXIT_SUCCESS);
 }
