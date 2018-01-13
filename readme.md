@@ -20,12 +20,13 @@ from the root of this Git repository before compiling. The code also depends on 
 #### Compiling
 A `Makefile` is located in `builds/linux`. Running
 ```
-make graph_viewer CUDA_SUPPORT=1
+make graph_viewer
 ```
 from this directory compiles `graph_viewer` with CUDA support.
+To compile without CUDA support, run `make graph_viewer CUDA_SUPPORT=0`.
 
 #### Usage
-`graph_viewer cuda|seq max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path test|image`
+`graph_viewer cuda|seq max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path`
 
 `cuda|seq`           : choose between a CUDA parallel implementation or a sequential implementation.
 
@@ -46,8 +47,6 @@ from this directory compiles `graph_viewer` with CUDA support.
 `edgelist_path`      : ASCII file containing node IDs for each edge on a separate line (whitespace separated)
 
 `out_path`           : path to write rendered .png files to
-
-`test|image`         : measure runningtimes or produce image of layout
 
 #### References
 <a name="jacomy14"><sup>1</sup></a> M. Jacomy, T. Venturini, S. Heymann, and M. Bastian, ["Forceatlas2, a continuous graph layout algorithm for handy network visualization designed for the Gephi software"](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0098679), PLoS ONE, vol. 9, no. 6, pp. 1–12, 2014.
