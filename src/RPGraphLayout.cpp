@@ -218,4 +218,26 @@ namespace RPGraph
         out_file.close();
     }
 
+    void GraphLayout::writeToBin(const char *path)
+    {
+        if (is_file_exists(path))
+        {
+            printf("Error: File exists at %s\n", path);
+            exit(EXIT_FAILURE);
+        }
+
+        std::ofstream out_file(path);
+        char out_buffer[sizeof(nid_t) + sizeof(float) +  sizeof(float)];
+        
+        for (nid_t n = 0; n < graph.num_nodes(); ++n)
+        {
+            *(nit_t *)(*out_buffer) = n;
+            *(float *)(*out_buffer + sizeof(nit_t)) = getX(n);
+            *(float *)(*out_buffer + sizeof(nit_t) + sizeof(float)) = getY(n);
+            out_file.write(out_buffer);
+        }
+
+        out_file.close();
+    }
+
 }

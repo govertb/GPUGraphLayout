@@ -142,6 +142,8 @@ int main(int argc, const char **argv)
 
             if (output_format == "png") {
                 layout.writeToPNG(framesize, framesize, op.c_str());
+            } else if (output_format == "bin") {
+                layout.writeToBin(op.c_str());
             } else if (output_format == "csv") {
                 layout.writeToFile(op.c_str());
             }

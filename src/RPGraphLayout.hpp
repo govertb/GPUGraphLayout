@@ -61,6 +61,7 @@ namespace RPGraph
         void setCoordinates(nid_t node_id, Coordinate c);
         void writeToPNG(const int width, const int height, const char *path);
         void writeToFile(const char *path);
+        void writeToBin(const char *path);
     };
 }
 
