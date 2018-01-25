@@ -65,7 +65,7 @@ int main(int argc, const char **argv)
     const bool approximate = std::string(argv[7]) == "approximate";
     const char *edgelist_path = argv[8];
     const char *out_path = argv[9];
-    const std::string output_format("png");
+    std::string output_format("png");
 
     if (argc > 10) {
         output_format = std::string(argv[4]);
@@ -143,7 +143,7 @@ int main(int argc, const char **argv)
             if (output_format == "png") {
                 layout.writeToPNG(framesize, framesize, op.c_str());
             }
-            
+
             printf("done.\n");
         }
 
