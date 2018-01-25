@@ -65,13 +65,12 @@ int main(int argc, const char **argv)
     const bool approximate = std::string(argv[7]) == "approximate";
     const char *edgelist_path = argv[8];
     const char *out_path = argv[9];
-    const std::string output_format;
+    const std::string output_format("png");
 
     if (argc > 10) {
         output_format = std::string(argv[4]);
-    } else {
-        output_format = std::string("png");
-    }
+    } 
+
     const int framesize = 10000;
     const float w = framesize;
     const float h = framesize;
@@ -140,15 +139,9 @@ int main(int argc, const char **argv)
             printf("Starting iteration %d (%.2f%%), writing %s...", iteration, 100*(float)iteration/max_iterations, output_format.c_str());
             fflush(stdout);
             fa2->sync_layout();
-            
-            switch (output_format.c_str()) {
-                case "png": {
-                    layout.writeToPNG(framesize, framesize, op.c_str());
-                    break;
-                }
-                default: {
-                    break;
-                }
+
+            if (output_format == "png") {
+                layout.writeToPNG(framesize, framesize, op.c_str());
             }
             
             printf("done.\n");
