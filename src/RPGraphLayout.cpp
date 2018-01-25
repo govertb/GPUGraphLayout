@@ -232,9 +232,9 @@ namespace RPGraph
         
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
         {
-            *(nit_t *)(*out_buffer) = n;
-            *(float *)(*out_buffer + sizeof(nit_t)) = getX(n);
-            *(float *)(*out_buffer + sizeof(nit_t) + sizeof(float)) = getY(n);
+            *(nid_t *)(*out_buffer) = n;
+            *(float *)(*out_buffer + sizeof(nid_t)) = getX(n);
+            *(float *)(*out_buffer + sizeof(nid_t) + sizeof(float)) = getY(n);
             out_file.write(out_buffer, buffer_size);
         }
 
