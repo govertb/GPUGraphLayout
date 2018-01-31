@@ -200,7 +200,7 @@ namespace RPGraph
         layout_png.write_png();
     }
 
-    void GraphLayout::writeToFile(const char *path)
+    void GraphLayout::writeToCSV(const char *path)
     {
         if (is_file_exists(path))
         {

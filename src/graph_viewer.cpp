@@ -145,7 +145,7 @@ int main(int argc, const char **argv)
             } else if (output_format == "bin") {
                 layout.writeToBin(op.c_str());
             } else if (output_format == "csv") {
-                layout.writeToFile(op.c_str());
+                layout.writeToCSV(op.c_str());
             }
 
             printf("done.\n");
