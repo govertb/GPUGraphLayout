@@ -46,7 +46,7 @@ To compile without CUDA support, run `make graph_viewer CUDA_SUPPORT=0`.
 
 `edgelist_path`      : ASCII file containing node IDs for each edge on a separate line (whitespace separated)
 
-`out_path`           : path to write rendered .png files to
+`out_path`           : path to write resulting layout to
 
 `[png|csv|bin]` is optional, defaulting to `png`, and determines the format of the layout written to `out_path`.
 
