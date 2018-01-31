@@ -226,16 +226,16 @@ namespace RPGraph
             exit(EXIT_FAILURE);
         }
 
-        std::ofstream out_file(path);
-        size_t buffer_size = sizeof(nid_t) + sizeof(float) +  sizeof(float);
-        char out_buffer[buffer_size];
+        std::ofstream out_file(path, std::ofstream::binary);
         
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
         {
-            *(nid_t *)(out_buffer) = n;
-            *(float *)(out_buffer + sizeof(nid_t)) = getX(n);
-            *(float *)(out_buffer + sizeof(nid_t) + sizeof(float)) = getY(n);
-            out_file.write(out_buffer, buffer_size);
+            float x = getX(n);
+            float y = getY(n);
+            
+            out_file.write(reinterpret_cast<const char*>(&n), sizeof(n));
+            out_file.write(reinterpret_cast<const char*>(&x), sizeof(x));
+            out_file.write(reinterpret_cast<const char*>(&y), sizeof(y));
         }
 
         out_file.close();
