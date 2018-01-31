@@ -200,7 +200,7 @@ namespace RPGraph
         layout_png.write_png();
     }
 
-    void GraphLayout::writeToFile(const char *path)
+    void GraphLayout::writeToCSV(const char *path)
     {
         if (is_file_exists(path))
         {
@@ -212,7 +212,32 @@ namespace RPGraph
 
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
         {
-            out_file << n << "," << getX(n) << "," << getY(n) << "\n";
+            nid_t id = graph.node_map_r[n]; // id as found in edgelist 
+            out_file << id << "," << getX(n) << "," << getY(n) << "\n";
+        }
+
+        out_file.close();
+    }
+
+    void GraphLayout::writeToBin(const char *path)
+    {
+        if (is_file_exists(path))
+        {
+            printf("Error: File exists at %s\n", path);
+            exit(EXIT_FAILURE);
+        }
+
+        std::ofstream out_file(path, std::ofstream::binary);
+        
+        for (nid_t n = 0; n < graph.num_nodes(); ++n)
+        {
+            nid_t id = graph.node_map_r[n]; // id as found in edgelist 
+            float x = getX(n);
+            float y = getY(n);
+            
+            out_file.write(reinterpret_cast<const char*>(&id), sizeof(id));
+            out_file.write(reinterpret_cast<const char*>(&x), sizeof(x));
+            out_file.write(reinterpret_cast<const char*>(&y), sizeof(y));
         }
 
         out_file.close();

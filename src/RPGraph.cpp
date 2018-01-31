@@ -78,7 +78,12 @@ namespace RPGraph
 
     void UGraph::add_node(nid_t nid)
     {
-        if(!has_node(nid)) node_map[nid] = node_count++;
+        if(!has_node(nid))
+        {
+            node_map[nid] = node_count;
+            node_map_r[node_count] = nid;
+            node_count++;
+        }
     }
 
     void UGraph::add_edge(nid_t s, nid_t t)

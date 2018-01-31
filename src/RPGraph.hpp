@@ -56,7 +56,6 @@ namespace RPGraph
     {
     private:
         nid_t node_count, edge_count;
-        std::unordered_map<nid_t, nid_t> node_map; // el id -> UGraph id
         std::unordered_map<nid_t, nid_t> degrees;
         std::unordered_map<nid_t, std::vector<nid_t>> adjacency_list;
 
@@ -69,6 +68,8 @@ namespace RPGraph
         // Construct UGraph from edgelist. IDs in edgelist are mapped to
         // [0, 1, ..., num_nodes-1]. Removes any self-edges.
         UGraph(std::string edgelist_path);
+        std::unordered_map<nid_t, nid_t> node_map; // el id -> UGraph id
+        std::unordered_map<nid_t, nid_t> node_map_r; // UGraph id -> el id
 
         virtual nid_t num_nodes() override;
         virtual nid_t num_edges() override;

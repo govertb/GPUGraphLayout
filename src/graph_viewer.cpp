@@ -50,9 +50,9 @@ int main(int argc, const char **argv)
     srandom(1234);
 
     // Parse commandline arguments
-    if (argc != 10)
+    if (argc < 10)
     {
-        fprintf(stderr, "Usage: graph_viewer cuda|seq max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path\n");
+        fprintf(stderr, "Usage: graph_viewer cuda|seq max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path [png|csv|bin]\n");
         exit(EXIT_FAILURE);
     }
 
@@ -65,6 +65,10 @@ int main(int argc, const char **argv)
     const bool approximate = std::string(argv[7]) == "approximate";
     const char *edgelist_path = argv[8];
     const char *out_path = argv[9];
+    std::string out_format;
+    if (argc > 10) out_format = std::string(argv[10]);
+    else out_format = "png";
+
     const int framesize = 10000;
     const float w = framesize;
     const float h = framesize;
@@ -129,11 +133,18 @@ int main(int argc, const char **argv)
         if (num_screenshots > 0 && (iteration % snap_period == 0 || iteration == max_iterations))
         {
             std::string op(out_path);
-            op.append("/").append(std::to_string(iteration)).append(".png");
-            printf("Starting iteration %d (%.2f%%), writing png...", iteration, 100*(float)iteration/max_iterations);
+            op.append("/").append(std::to_string(iteration)).append(".").append(out_format);
+            printf("Starting iteration %d (%.2f%%), writing %s...", iteration, 100*(float)iteration/max_iterations, out_format.c_str());
             fflush(stdout);
             fa2->sync_layout();
-            layout.writeToPNG(framesize, framesize, op.c_str());
+
+            if (out_format == "png")
+                layout.writeToPNG(framesize, framesize, op.c_str());
+            else if (out_format == "csv")
+                layout.writeToCSV(op.c_str());
+            else if (out_format == "bin")
+                layout.writeToBin(op.c_str());
+            
             printf("done.\n");
         }
 
