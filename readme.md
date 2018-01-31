@@ -26,9 +26,9 @@ from this directory compiles `graph_viewer` with CUDA support.
 To compile without CUDA support, run `make graph_viewer CUDA_SUPPORT=0`.
 
 #### Usage
-`graph_viewer cuda|seq max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path [png|csv|bin]`
+`graph_viewer gpu|cpu max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path [png|csv|bin]`
 
-`cuda|seq`           : choose between a CUDA parallel implementation or a sequential implementation.
+`gpu|cpu`            : choose between a parallel GPU implementation or a serial CPU implementation.
 
 `max_iterations`     : how many iterations of the layout algorithm to run
 
@@ -42,7 +42,7 @@ To compile without CUDA support, run `make graph_viewer CUDA_SUPPORT=0`.
 `gravity`            : scale gravitational force
 
 `exact|approximate`  : choose between the exact/pairwise O(|V|^2) repulsive force calculation or the O(|V|lg(|V|))
-                     approximation using Barnes-Hut (CUDA implementation only supports Barnes-Hut)
+                     approximation using Barnes-Hut (GPU implementation only supports Barnes-Hut)
 
 `edgelist_path`      : ASCII file containing node IDs for each edge on a separate line (whitespace separated)
 

@@ -52,11 +52,11 @@ int main(int argc, const char **argv)
     // Parse commandline arguments
     if (argc < 10)
     {
-        fprintf(stderr, "Usage: graph_viewer cuda|seq max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path [png|csv|bin]\n");
+        fprintf(stderr, "Usage: graph_viewer gpu|cpu max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path [png|csv|bin]\n");
         exit(EXIT_FAILURE);
     }
 
-    const bool cuda_requested = std::string(argv[1]) == "cuda";
+    const bool cuda_requested = std::string(argv[1]) == "gpu" or std::string(argv[1]) == "cuda";
     const int max_iterations = std::stoi(argv[2]);
     const int num_screenshots = std::stoi(argv[3]);
     const bool strong_gravity = std::string(argv[4]) == "sg";
