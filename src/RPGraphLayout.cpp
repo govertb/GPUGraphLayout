@@ -212,7 +212,8 @@ namespace RPGraph
 
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
         {
-            out_file << n << "," << getX(n) << "," << getY(n) << "\n";
+            nid_t id = graph.node_map_r[n]; // id as found in edgelist 
+            out_file << id << "," << getX(n) << "," << getY(n) << "\n";
         }
 
         out_file.close();
@@ -230,10 +231,11 @@ namespace RPGraph
         
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
         {
+            nid_t id = graph.node_map_r[n]; // id as found in edgelist 
             float x = getX(n);
             float y = getY(n);
             
-            out_file.write(reinterpret_cast<const char*>(&n), sizeof(n));
+            out_file.write(reinterpret_cast<const char*>(&id), sizeof(id));
             out_file.write(reinterpret_cast<const char*>(&x), sizeof(x));
             out_file.write(reinterpret_cast<const char*>(&y), sizeof(y));
         }
