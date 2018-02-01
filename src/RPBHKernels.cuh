@@ -87,8 +87,8 @@ void SortKernel(int nnodesd, int nbodiesd, int * __restrict sortd, int * __restr
 __global__
 __launch_bounds__(THREADS5, FACTOR5)
 void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epssqd,
-                            volatile int * __restrict sortd, volatile int * __restrict childd, 
-                            volatile float * __restrict body_massd, volatile float * __restrict node_massd, 
+                            volatile int * __restrict sortd, volatile int * __restrict childd,
+                            volatile float * __restrict body_massd, volatile float * __restrict node_massd,
                             volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd,
                             volatile float * __restrict fxd, volatile float * __restrict fyd, const float k_rd);
 

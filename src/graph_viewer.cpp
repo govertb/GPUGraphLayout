@@ -116,7 +116,7 @@ int main(int argc, const char **argv)
     else
     #endif
         fa2 = new RPGraph::CPUForceAtlas2(layout);
-    
+
     fa2->strong_gravity = strong_gravity;
     fa2->use_barneshut = approximate;
     fa2->setScale(scale);
@@ -144,7 +144,7 @@ int main(int argc, const char **argv)
                 layout.writeToCSV(op.c_str());
             else if (out_format == "bin")
                 layout.writeToBin(op.c_str());
-            
+
             printf("done.\n");
         }
 
@@ -154,7 +154,7 @@ int main(int argc, const char **argv)
             printf("Starting iteration %d (%.2f%%).\n", iteration, 100*(float)iteration/max_iterations);
         }
     }
-    
+
     delete fa2;
     exit(EXIT_SUCCESS);
 }

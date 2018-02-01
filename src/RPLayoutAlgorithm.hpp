@@ -34,7 +34,7 @@ namespace RPGraph
         LayoutAlgorithm(GraphLayout &layout);
         ~LayoutAlgorithm();
         GraphLayout &layout;
-        
+
         virtual void sync_layout() = 0; // write current layout to `layout'.
     };
 }

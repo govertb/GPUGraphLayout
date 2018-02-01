@@ -440,7 +440,7 @@ void SummarizationKernel(const int nnodesd, const int nbodiesd, volatile int * _
             k += inc;
         else if(k >= nbodiesd and node_massd[k] >= 0.0f)
             k += inc;
-        
+
         else
         {
             if (j == 0)
@@ -571,7 +571,7 @@ void SortKernel(int nnodesd, int nbodiesd, int * __restrict sortd, int * __restr
 __global__
 __launch_bounds__(THREADS5, FACTOR5)
 void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epssqd,
-                            volatile int * __restrict sortd, volatile int * __restrict childd, 
+                            volatile int * __restrict sortd, volatile int * __restrict childd,
                             volatile float * __restrict body_massd, volatile float * __restrict node_massd,
                             volatile float2 * __restrict body_posd, volatile float2 * __restrict node_posd,
                             volatile float * __restrict fxd, volatile float * __restrict fyd, const float k_rd)
@@ -661,7 +661,7 @@ void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epss
                             ax += k_rd * dx * body_massd[i] * body_massd[n] / tmp;
                             ay += k_rd * dy * body_massd[i] * body_massd[n] / tmp;
                         }
-                        
+
                         // or, if n is cell, ensure all threads agree that cell is far enough away
                         else if(__all(tmp >= dq[depth]))
                         {

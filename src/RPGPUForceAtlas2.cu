@@ -272,8 +272,8 @@ namespace RPGraph
         cudaCatchError(cudaMemcpy(targetsl, targets, sizeof(int) * nedges, cudaMemcpyHostToDevice));
         cudaDeviceSynchronize();
     }
-    
-    void CUDAForceAtlas2::sync_layout() 
+
+    void CUDAForceAtlas2::sync_layout()
     {
         retrieveLayoutFromGPU();
         for(nid_t n = 0; n < layout.graph.num_nodes(); ++n)

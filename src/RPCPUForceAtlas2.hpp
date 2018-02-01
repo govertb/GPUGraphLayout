@@ -29,7 +29,7 @@
 namespace RPGraph
 {
     class CPUForceAtlas2 : public ForceAtlas2
-    {   
+    {
     public:
         CPUForceAtlas2(GraphLayout &layout);
         ~CPUForceAtlas2();

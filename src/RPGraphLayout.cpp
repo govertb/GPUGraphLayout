@@ -182,7 +182,7 @@ namespace RPGraph
         // Write to file.
         pngwriter layout_png(width, height, 0, path);
         layout_png.invert(); // set bg. to white
-        
+
         for (nid_t n1 = 0; n1 < graph.num_nodes(); ++n1)
         {
             // Plot node,
@@ -212,7 +212,7 @@ namespace RPGraph
 
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
         {
-            nid_t id = graph.node_map_r[n]; // id as found in edgelist 
+            nid_t id = graph.node_map_r[n]; // id as found in edgelist
             out_file << id << "," << getX(n) << "," << getY(n) << "\n";
         }
 
@@ -228,13 +228,13 @@ namespace RPGraph
         }
 
         std::ofstream out_file(path, std::ofstream::binary);
-        
+
         for (nid_t n = 0; n < graph.num_nodes(); ++n)
         {
-            nid_t id = graph.node_map_r[n]; // id as found in edgelist 
+            nid_t id = graph.node_map_r[n]; // id as found in edgelist
             float x = getX(n);
             float y = getY(n);
-            
+
             out_file.write(reinterpret_cast<const char*>(&id), sizeof(id));
             out_file.write(reinterpret_cast<const char*>(&x), sizeof(x));
             out_file.write(reinterpret_cast<const char*>(&y), sizeof(y));

@@ -67,7 +67,7 @@ namespace RPGraph
     {
         k_g = g;
     }
-    
+
     float ForceAtlas2::mass(nid_t n)
     {
         return layout.graph.degree(n) + 1.0;

@@ -34,7 +34,7 @@ namespace RPGraph
         public:
             ForceAtlas2(GraphLayout &layout);
             ~ForceAtlas2();
-            
+
             virtual void doStep() = 0;
             void doSteps(int n);
             void setScale(float s);
@@ -47,7 +47,7 @@ namespace RPGraph
             float k_r, k_g; // scalars for repulsive and gravitational force.
             float delta; // edgeweight influence.
             float global_speed;
-            
+
             // Parameters used in adaptive temperature
             float speed_efficiency, jitter_tolerance;
             float k_s, k_s_max; // magic constants related to swinging.

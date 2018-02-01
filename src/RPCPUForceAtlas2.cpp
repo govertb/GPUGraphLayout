@@ -220,7 +220,7 @@ namespace RPGraph
             apply_attract(n);
             apply_repulsion(n);
         }
-        
+
         updateSpeeds();
 
         for (nid_t n = 0; n < layout.graph.num_nodes(); ++n)
@@ -231,7 +231,7 @@ namespace RPGraph
         }
         iteration++;
     }
-    
+
     void CPUForceAtlas2::sync_layout() {}
 
 }
