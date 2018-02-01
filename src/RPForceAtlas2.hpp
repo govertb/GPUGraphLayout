@@ -51,7 +51,11 @@ namespace RPGraph
             // Parameters used in adaptive temperature
             float speed_efficiency, jitter_tolerance;
             float k_s, k_s_max; // magic constants related to swinging.
-            float theta;        // an accuracy parameter used for BarnesHut.
+            
+            // Barnes-Hut parameters
+            float theta;   // Accuracy
+            float epssq;   // Softening (Epsilon, squared)
+            float itolsq;  // Inverse tolerance, squared
     };
 }
 #endif

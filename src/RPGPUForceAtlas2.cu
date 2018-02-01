@@ -223,8 +223,6 @@ namespace RPGraph
         SortKernel<<<mp_count * FACTOR4, THREADS4>>>(nnodes, nbodies, sortl, countl, startl, childl);
 
         // Compute repulsive forces between nodes using BH. tree.
-        float epssq  = 0.05 * 0.05;            // Some sort of softening (eps, squared)
-        float itolsq = 1.0f / (theta * theta); // Inverse tolerance, squared
         ForceCalculationKernel<<<mp_count * FACTOR5, THREADS5>>>(nnodes, nbodies, itolsq, epssq, sortl, childl, body_massl, node_massl, body_posl, node_posl, fxl, fyl, k_r);
 
         SpeedKernel<<<mp_count * FACTOR1, THREADS1>>>(nbodies, fxl, fyl, fx_prevl, fy_prevl, body_massl, swgl, etral);
