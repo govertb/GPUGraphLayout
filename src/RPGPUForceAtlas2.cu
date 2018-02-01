@@ -203,8 +203,6 @@ namespace RPGraph
 
     void CUDAForceAtlas2::doStep()
     {
-        int err = 0;
-
         GravityKernel<<<mp_count * FACTOR6, THREADS6>>>(nbodies, k_g, strong_gravity, body_massl, body_posl, fxl, fyl);
 
         AttractiveForceKernel<<<mp_count * FACTOR6, THREADS6>>>(nedges, body_posl, fxl, fyl, sourcesl, targetsl);
@@ -216,15 +214,6 @@ namespace RPGraph
         ClearKernel1<<<mp_count, 1024>>>(nnodes, nbodies, childl);
         // 2.) Build the tree
         TreeBuildingKernel<<<mp_count * FACTOR2, THREADS2>>>(nnodes, nbodies, childl, body_posl, node_posl);
-
-        cudaDeviceSynchronize();
-        cudaCatchError(cudaMemcpyFromSymbol(&err, errd, sizeof(int), 0, cudaMemcpyDeviceToHost));
-        if (err != 0)
-        {
-            fprintf(stderr, "error: An error occurred in TreeBuildingKernel, errd == %d\n", err);
-            // exit(EXIT_FAILURE);
-        }
-
         // 3.) Set all cell mass values to -1.0, set all startd to null (-1)
         ClearKernel2<<<mp_count, 1024>>>(nnodes, startl, node_massl);
 
@@ -238,18 +227,11 @@ namespace RPGraph
         float itolsq = 1.0f / (theta * theta); // Inverse tolerance, squared
         ForceCalculationKernel<<<mp_count * FACTOR5, THREADS5>>>(nnodes, nbodies, itolsq, epssq, sortl, childl, body_massl, node_massl, body_posl, node_posl, fxl, fyl, k_r);
 
-        cudaDeviceSynchronize();
-        cudaCatchError(cudaMemcpyFromSymbol(&err, errd, sizeof(int), 0, cudaMemcpyDeviceToHost));
-        if (err != 0)
-        {
-            fprintf(stderr, "error: An error occurred in ForceCalculationKernel, errd == %d\n", err);
-            exit(EXIT_FAILURE);
-        }
-
         SpeedKernel<<<mp_count * FACTOR1, THREADS1>>>(nbodies, fxl, fyl, fx_prevl, fy_prevl, body_massl, swgl, etral);
 
         DisplacementKernel<<<mp_count * FACTOR6, THREADS6>>>(nbodies, body_posl, fxl, fyl, fx_prevl, fy_prevl);
-
+        
+        cudaCatchError(cudaDeviceSynchronize());
         iteration++;
     }
 

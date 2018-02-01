@@ -47,10 +47,10 @@
  */
 
 #include <stdio.h>
+#include <assert.h>
 #include "RPBHKernels.cuh"
 
 // Variables marked extern in header.
-__device__ volatile int errd = 0;
 __device__ float minxdg, minydg, maxxdg, maxydg;
 
 
@@ -283,12 +283,7 @@ void TreeBuildingKernel(int nnodesd, int nbodiesd, volatile int * __restrict chi
                     {
                         // 1.) Create new cell
                         cell = atomicSub((int *)&bottomd, 1) - 1;
-                        if (cell <= nbodiesd)
-                        {
-                            errd = 1;
-                            printf("Error in TreekBuildingKernel: cell <= nbodiesd\n");
-                            bottomd = nnodesd;
-                        }
+                        assert(cell > nbodiesd);
 
                         if (patch != -1) childd[n*4+j] = cell;
                         patch = max(patch, cell);
@@ -593,7 +588,7 @@ void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epss
         }
         dq[i - 1] += epssqd;
 
-        if (maxdepthd > MAXDEPTH) errd = maxdepthd;
+        assert(maxdepthd <= MAXDEPTH);
     }
     __syncthreads();
 

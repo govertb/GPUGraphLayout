@@ -18,6 +18,7 @@ ifeq ($(DEBUG), 1)
 	NVCCFLAGS:=-G
 	O_LVL:=-O0
 else
+	NVCCFLAGS:=-D NDEBUG
 	O_LVL:=-O3
 endif
 
