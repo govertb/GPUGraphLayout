@@ -35,6 +35,10 @@ namespace RPGraph
         : graph(graph), width(width), height(height)
     {
         coordinates = (Coordinate *) malloc(graph.num_nodes() * sizeof(Coordinate));
+        minx = std::numeric_limits<float>::max();
+        miny = std::numeric_limits<float>::max();
+        maxx = std::numeric_limits<float>::min();
+        maxy = std::numeric_limits<float>::min();
     }
 
     GraphLayout::~GraphLayout()
@@ -63,34 +67,22 @@ namespace RPGraph
 
     float GraphLayout::minX()
     {
-        float minX = std::numeric_limits<float>::max();
-        for (nid_t n = 0; n < graph.num_nodes(); ++n)
-            if (getX(n) < minX) minX = getX(n);
-        return minX;
+        return this->minx;
     }
 
     float GraphLayout::maxX()
     {
-        float maxX = std::numeric_limits<float>::min();
-        for (nid_t n = 0; n < graph.num_nodes(); ++n)
-            if (getX(n) > maxX) maxX = getX(n);
-        return maxX;
+        return this->maxx;
     }
 
     float GraphLayout::minY()
     {
-        float minY = std::numeric_limits<float>::max();
-        for (nid_t n = 0; n < graph.num_nodes(); ++n)
-            if (getY(n) < minY) minY = getY(n);
-        return minY;
+        return this->miny;
     }
 
     float GraphLayout::maxY()
     {
-        float maxY = std::numeric_limits<float>::min();
-        for (nid_t n = 0; n < graph.num_nodes(); ++n)
-            if (getY(n) > maxY) maxY = getY(n);
-        return maxY;
+        return this->maxy;
     }
 
     float GraphLayout::getXRange()
@@ -105,7 +97,7 @@ namespace RPGraph
 
     float GraphLayout::getSpan()
     {
-        return ceil(fmaxf(getXRange(), getYRange()));
+        return fmaxf(getXRange(), getYRange());
     }
 
     float GraphLayout::getDistance(nid_t n1, nid_t n2)
@@ -147,11 +139,15 @@ namespace RPGraph
 
     void GraphLayout::setX(nid_t node_id, float x_value)
     {
+        minx = fminf(minx, x_value);
+        maxx = fmaxf(maxx, x_value);
         coordinates[node_id].x = x_value;
     }
 
     void GraphLayout::setY(nid_t node_id, float y_value)
     {
+        miny = fminf(miny, y_value);
+        maxy = fmaxf(maxy, y_value);
         coordinates[node_id].y = y_value;
     }
 
