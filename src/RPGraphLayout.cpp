@@ -103,6 +103,11 @@ namespace RPGraph
         return maxY() - minY();
     }
 
+    float GraphLayout::getSpan()
+    {
+        return ceil(fmaxf(getXRange(), getYRange()));
+    }
+
     float GraphLayout::getDistance(nid_t n1, nid_t n2)
     {
         const float dx = getX(n1)-getX(n2);

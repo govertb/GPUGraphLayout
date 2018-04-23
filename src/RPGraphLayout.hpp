@@ -48,7 +48,7 @@ namespace RPGraph
         void randomizePositions();
 
         float getX(nid_t node_id), getY(nid_t node_id);
-        float getXRange(), getYRange();
+        float getXRange(), getYRange(), getSpan();
         float getDistance(nid_t n1, nid_t n2);
         Real2DVector getDistanceVector(nid_t n1, nid_t n2);
         Real2DVector getNormalizedDistanceVector(nid_t n1, nid_t n2);
