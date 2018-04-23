@@ -25,7 +25,6 @@
 #define RPBarnesHutApproximator_hpp
 
 #include "RPGraph.hpp"
-#include "RPGraphLayout.hpp"
 #include "RPCommon.hpp"
 
 namespace RPGraph
@@ -52,17 +51,18 @@ namespace RPGraph
     class BarnesHutApproximator
     {
     public:
-        BarnesHutApproximator(float theta, GraphLayout &layout);
+        BarnesHutApproximator(Coordinate root_center, float root_length, float theta);
         Real2DVector approximateForce(Coordinate particle_pos, float particle_mass, float theta);
         void insertParticle(Coordinate particle_position, float particle_mass);
 
-        void rebuild();
+        void reset(Coordinate root_center, float root_length);
         void setTheta(float theta);
 
     private:
-        GraphLayout &layout;
         BarnesHutCell *root_cell = nullptr;
         const float theta;
+        Coordinate root_center;
+        float root_length;
 
     };
 }

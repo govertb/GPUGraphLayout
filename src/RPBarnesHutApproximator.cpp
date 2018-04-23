@@ -36,6 +36,11 @@ namespace RPGraph
         bb = position.y - length/2.0;
         ub = position.y + length/2.0;
     }
+    
+    BarnesHutCell::~BarnesHutCell()
+    {
+        for (nid_t n = 0; n < 4; ++n) delete sub_cells[n];
+    }
 
     void BarnesHutCell::add_leafcell(int quadrant, float mass, Coordinate pos)
     {
@@ -54,12 +59,22 @@ namespace RPGraph
 
     }
 
-    BarnesHutApproximator::BarnesHutApproximator(float theta, GraphLayout &layout)
-        : theta(theta), layout(layout)
+    BarnesHutApproximator::BarnesHutApproximator(Coordinate root_center, float root_length, float theta)
+    : root_center{root_center}, root_length{root_length}, theta{theta}
     {
-        this->rebuild();
+        this->reset(root_center, root_length);
     }
 
+    void BarnesHutApproximator::reset(Coordinate root_center, float root_length)
+    {
+        delete root_cell; // this recursively deletes the entire tree
+        root_cell = nullptr;
+        
+        this->root_center = root_center;
+        this->root_length = root_length;
+    }
+
+    
     Real2DVector BarnesHutApproximator::approximateForce(Coordinate particle_pos, float particle_mass, float theta)
     {
         Real2DVector force = Real2DVector(0.0, 0.0);
@@ -93,74 +108,67 @@ namespace RPGraph
         return force;
     }
 
-    BarnesHutCell::~BarnesHutCell()
-    {
-        for (nid_t n = 0; n < 4; ++n) delete sub_cells[n];
-    }
-
     void BarnesHutApproximator::insertParticle(RPGraph::Coordinate particle_position, float particle_mass)
     {
-        BarnesHutCell *cur_cell = root_cell;
-        while (true)
+        if(not root_cell)
         {
-            const int quadrant_new_particle = (particle_position-cur_cell->cell_center).quadrant();
-
-            if (particle_position.y > cur_cell->ub || particle_position.x > cur_cell->rb ||
-                particle_position.x < cur_cell->lb || particle_position.y < cur_cell->bb)
+            root_cell = new BarnesHutCell(this->root_center, this->root_length, 
+                                          particle_position, particle_mass);
+        }
+        
+        else
+        {
+            BarnesHutCell *cur_cell = root_cell;
+            while (true)
             {
-                //fprintf(stderr, "error: Barnes-Hut: Can't insert particle out of bounds of this cell.\n");
-                return;
-            }
+                const int quadrant_new_particle = (particle_position-cur_cell->cell_center).quadrant();
 
-            // N.B. a BarnesHutCell is never empty, but can lack subparticles/cells.
-            // If so, we need to create, and insert, a subcell for the single particle that
-            // is stored in this cell.
-            if (cur_cell->num_subparticles == 0)
-            {
-                if (particle_position == cur_cell->mass_center)
+                if (particle_position.y > cur_cell->ub or particle_position.x > cur_cell->rb or
+                    particle_position.x < cur_cell->lb or particle_position.y < cur_cell->bb)
                 {
-                    // We want two particles in the same place...
-                    // Thats equivalent to a single particle with summed masses.
-                    // mass_center won't change.
-                    cur_cell->total_mass += particle_mass;
+                    //fprintf(stderr, "error: Barnes-Hut: Can't insert particle out of bounds of this cell.\n");
                     return;
                 }
 
-                // We move the single particle to a subcell.
-                int quadrant_existing_particle = (cur_cell->mass_center - cur_cell->cell_center).quadrant();
-                cur_cell->add_leafcell(quadrant_existing_particle, cur_cell->total_mass, cur_cell->mass_center);
+                // N.B. a BarnesHutCell is never empty, but can lack subparticles/cells.
+                // If so, we need to create, and insert, a subcell for the single particle that
+                // is stored in this cell.
+                if (cur_cell->num_subparticles == 0)
+                {
+                    if (particle_position == cur_cell->mass_center)
+                    {
+                        // We want two particles in the same place...
+                        // Thats equivalent to a single particle with summed masses.
+                        // mass_center won't change.
+                        cur_cell->total_mass += particle_mass;
+                        return;
+                    }
+
+                    // We move the single particle to a subcell.
+                    int quadrant_existing_particle = (cur_cell->mass_center - cur_cell->cell_center).quadrant();
+                    cur_cell->add_leafcell(quadrant_existing_particle, cur_cell->total_mass, cur_cell->mass_center);
+                }
+
+                // We assume inserting will succeed, and update total_mass and mass_center accordingly
+                cur_cell->total_mass  += particle_mass;
+                cur_cell->mass_center  = cur_cell->mass_center * (float) (cur_cell->num_subparticles);
+                cur_cell->mass_center += particle_position;
+                cur_cell->mass_center /= (cur_cell->num_subparticles+1);
+
+                // If we can add a leaf-cell in an empty slot, we do so.
+                if (cur_cell->sub_cells[quadrant_new_particle] == nullptr)
+                {
+                    cur_cell->add_leafcell(quadrant_new_particle, particle_mass, particle_position);
+                    return;
+                }
+
+                // Else we recurse to the occupied cell.
+                else
+                {
+                    cur_cell->num_subparticles += 1;
+                    cur_cell = cur_cell->sub_cells[quadrant_new_particle];
+                }
             }
-
-            // We assume inserting will succeed, and update total_mass and mass_center accordingly
-            cur_cell->total_mass  += particle_mass;
-            cur_cell->mass_center  = cur_cell->mass_center * (float) (cur_cell->num_subparticles);
-            cur_cell->mass_center += particle_position;
-            cur_cell->mass_center /= (cur_cell->num_subparticles+1);
-
-            // If we can add a leaf-cell in an empty slot, we do so.
-            if (cur_cell->sub_cells[quadrant_new_particle] == nullptr)
-            {
-                cur_cell->add_leafcell(quadrant_new_particle, particle_mass, particle_position);
-                return;
-            }
-
-            // Else we recurse to the occupied cell.
-            else
-            {
-                cur_cell->num_subparticles += 1;
-                cur_cell = cur_cell->sub_cells[quadrant_new_particle];
-            }
-        }
-    }
-
-    void BarnesHutApproximator::rebuild()
-    {
-        delete root_cell; // If they exist, this recursively deletes all subcells as well.
-        const float length = ceil(fmaxf(layout.getXRange(), layout.getYRange())) + 10;
-        root_cell = new BarnesHutCell(layout.getCenter(), length, layout.getCoordinate(0), layout.graph.degree(0)+1);
-        for (nid_t n = 1; n < layout.graph.num_nodes(); ++n)
-        {
-            this->insertParticle(layout.getCoordinate(n), layout.graph.degree(n)+1);
         }
     }
 }

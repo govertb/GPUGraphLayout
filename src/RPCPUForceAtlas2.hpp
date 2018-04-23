@@ -45,6 +45,7 @@ namespace RPGraph
         float tra(nid_t n);            // traction ..
 
         // Substeps of one step in layout process.
+        void rebuild_bh();
         void apply_repulsion(nid_t n);
         void apply_gravity(nid_t n);
         void apply_attract(nid_t n);
