@@ -24,7 +24,6 @@
 #include "RPBarnesHutApproximator.hpp"
 #include <math.h>
 #include <stdlib.h>
-#include <stack>
 #include <queue>
 
 namespace RPGraph
