@@ -42,7 +42,7 @@ namespace RPGraph
         GraphLayout(RPGraph::UGraph &graph, float width, float height);
         ~GraphLayout();
 
-        UGraph graph; // to lay-out
+        UGraph &graph; // to lay-out
 
         // randomize the layout position of all nodes.
         void randomizePositions();
