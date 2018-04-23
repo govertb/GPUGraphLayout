@@ -163,7 +163,8 @@ namespace RPGraph
         setY(node_id, c.y);
     }
 
-    void GraphLayout::writeToPNG(const int width, const int height, const char *path)
+    void GraphLayout::writeToPNG(const int image_w, const int image_h, 
+                                 std::string path)
     {
         const float xRange = getXRange();
         const float yRange = getYRange();
@@ -172,8 +173,8 @@ namespace RPGraph
         const float yCenter = center.y;
         const float minX = xCenter - xRange/2.0;
         const float minY = yCenter - yRange/2.0;
-        const float xScale = width/xRange;
-        const float yScale = height/yRange;
+        const float xScale = image_w/xRange;
+        const float yScale = image_h/yRange;
 
         // Here we need to do some guessing as to what the optimal
         // opacity of nodes and edges might be, given how many of them we need to draw.
@@ -181,7 +182,7 @@ namespace RPGraph
         const float edge_opacity = 1/(0.00001 * graph.num_edges());
 
         // Write to file.
-        pngwriter layout_png(width, height, 0, path);
+        pngwriter layout_png(image_w, image_h, 0, path.c_str());
         layout_png.invert(); // set bg. to white
 
         for (nid_t n1 = 0; n1 < graph.num_nodes(); ++n1)
@@ -201,11 +202,11 @@ namespace RPGraph
         layout_png.write_png();
     }
 
-    void GraphLayout::writeToCSV(const char *path)
+    void GraphLayout::writeToCSV(std::string path)
     {
-        if (is_file_exists(path))
+        if (is_file_exists(path.c_str()))
         {
-            printf("Error: File exists at %s\n", path);
+            printf("Error: File exists at %s\n", path.c_str());
             exit(EXIT_FAILURE);
         }
 
@@ -220,11 +221,11 @@ namespace RPGraph
         out_file.close();
     }
 
-    void GraphLayout::writeToBin(const char *path)
+    void GraphLayout::writeToBin(std::string path)
     {
-        if (is_file_exists(path))
+        if (is_file_exists(path.c_str()))
         {
-            printf("Error: File exists at %s\n", path);
+            printf("Error: File exists at %s\n", path.c_str());
             exit(EXIT_FAILURE);
         }
 

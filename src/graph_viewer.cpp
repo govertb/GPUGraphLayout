@@ -139,11 +139,11 @@ int main(int argc, const char **argv)
             fa2->sync_layout();
 
             if (out_format == "png")
-                layout.writeToPNG(framesize, framesize, op.c_str());
+                layout.writeToPNG(framesize, framesize, op);
             else if (out_format == "csv")
-                layout.writeToCSV(op.c_str());
+                layout.writeToCSV(op);
             else if (out_format == "bin")
-                layout.writeToBin(op.c_str());
+                layout.writeToBin(op);
 
             printf("done.\n");
         }
