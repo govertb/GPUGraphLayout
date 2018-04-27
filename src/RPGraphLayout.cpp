@@ -177,9 +177,9 @@ namespace RPGraph
         const float yScale = image_h/yRange;
 
         // Here we need to do some guessing as to what the optimal
-        // opacity of nodes and edges might be, given how many of them we need to draw.
-        const float node_opacity = 1/(0.0001  * graph.num_nodes());
-        const float edge_opacity = 1/(0.00001 * graph.num_edges());
+        // opacity of nodes and edges might be, given network size.
+        const float node_opacity = 10000.0  / graph.num_nodes();
+        const float edge_opacity = 100000.0 / graph.num_edges();
 
         // Write to file.
         pngwriter layout_png(image_w, image_h, 0, path.c_str());
