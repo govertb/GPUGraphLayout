@@ -38,7 +38,7 @@ namespace RPGraph
     // NOTE: uint32_t limits density to 50% for directed graphs.
     typedef uint32_t eid_t;
 
-    // Virtual base class to derive different Gaphs types from.
+    // Virtual base class to derive different Graph types from.
     class Graph
     {
         public:
