@@ -24,7 +24,6 @@
  Advanced Computer Science (www.liacs.nl). For other resources related to this
  project, see https://liacs.leidenuniv.nl/~takesfw/GPUNetworkVis/.
 
-
  ==============================================================================
 */
 

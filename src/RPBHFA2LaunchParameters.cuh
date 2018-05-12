@@ -1,7 +1,7 @@
 /// Per kernel launch configuration parameters
 // 1: BoundingBoxKernel, SpeedKernel (reductions of size |V|)
 // 2: TreeBuild
-// 3: Summurization
+// 3: Summarization
 // 4: SortKernel
 // 5: ForceKernel
 // 6: DisplacementKernel, GravityKernel, AttractiveForce (all 'streaming' kernels)
