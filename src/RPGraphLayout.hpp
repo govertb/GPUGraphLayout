@@ -33,19 +33,17 @@ namespace RPGraph
     class GraphLayout
     {
     private:
-        Coordinate *coordinates; // only access through setX,setY
-        float minx, maxx;
-        float miny, maxy;
-        
+        Coordinate *coordinates;
+
     protected:
         float width, height;
+        float minX(), minY(), maxX(), maxY();
 
     public:
         GraphLayout(RPGraph::UGraph &graph, float width, float height);
         ~GraphLayout();
 
         UGraph &graph; // to lay-out
-        float minX(), minY(), maxX(), maxY();
 
         // randomize the layout position of all nodes.
         void randomizePositions();
