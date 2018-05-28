@@ -57,7 +57,7 @@ To compile without CUDA support, run `make graph_viewer CUDA_SUPPORT=0`.
 
 <a name="barnes86"><sup>3</sup></a>J. Barnes and P. Hut, ["A hierarchical O(N log N) force-calculation algorithm"](https://www.nature.com/nature/journal/v324/n6096/abs/324446a0.html), Nature, vol. 324, pp. 446–449, 1986.
 
-<a name="burtscher11"><sup>4</sup></a> M. Burtscher and K. Pingali, "An efficient CUDA implementation of the tree-based Barnes Hut n-body algorithm", in GPU Computing Gems Emerald Edition, W. mei W. Hwu, Ed., 2011, ch. 6, pp. 75–92.
+<a name="burtscher11"><sup>4</sup></a> M. Burtscher and K. Pingali, ["An efficient CUDA implementation of the tree-based Barnes Hut n-body algorithm"](https://www.sciencedirect.com/science/article/pii/B9780123849885000061), in GPU Computing Gems Emerald Edition, W. mei W. Hwu, Ed., 2011, ch. 6, pp. 75–92.
 
 #### License
 Most source files for this program are released under the GNU Affero General Public License. The license notice in each file provides more information. A copy of the GNU Affero General Public License can be found in the `LICENCE` file.
