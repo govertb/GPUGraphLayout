@@ -40,7 +40,8 @@ namespace RPGraph
         float minX(), minY(), maxX(), maxY();
 
     public:
-        GraphLayout(RPGraph::UGraph &graph, float width, float height);
+        GraphLayout(RPGraph::UGraph &graph, 
+                    float width = 10000, float height = 10000);
         ~GraphLayout();
 
         UGraph &graph; // to lay-out

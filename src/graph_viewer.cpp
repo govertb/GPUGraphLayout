@@ -51,7 +51,7 @@ int main(int argc, const char **argv)
     // Parse commandline arguments
     if (argc < 10)
     {
-        fprintf(stderr, "Usage: graph_viewer gpu|cpu max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path [png|csv|bin]\n");
+        fprintf(stderr, "Usage: graph_viewer gpu|cpu max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path [png image_w image_h|csv|bin]\n");
         exit(EXIT_FAILURE);
     }
 
@@ -64,13 +64,31 @@ int main(int argc, const char **argv)
     const bool approximate = std::string(argv[7]) == "approximate";
     const char *edgelist_path = argv[8];
     const char *out_path = argv[9];
-    std::string out_format;
-    if (argc > 10) out_format = std::string(argv[10]);
-    else out_format = "png";
+    std::string out_format = "png";
+    int image_w = 1250;
+    int image_h = 1250;
 
-    const int framesize = 10000;
-    const float w = framesize;
-    const float h = framesize;
+    for (int arg_no = 10; arg_no < argc; arg_no++) 
+    {
+        if(std::string(argv[arg_no]) == "png")
+        {
+            out_format = "png";
+            image_w = std::stoi(argv[arg_no+1]);
+            image_h = std::stoi(argv[arg_no+2]);
+            arg_no += 2;
+        }
+        
+        else if(std::string(argv[arg_no]) == "csv")
+        {
+            out_format = "csv";
+        }
+        
+        else if(std::string(argv[arg_no]) == "bin")
+        {
+            out_format = "bin";
+        }
+    }
+    
 
     if(cuda_requested and not approximate)
     {
@@ -107,7 +125,7 @@ int main(int argc, const char **argv)
     printf("    fetched %d nodes and %d edges.\n", graph.num_nodes(), graph.num_edges());
 
     // Create the GraphLayout and ForceAtlas2 objects.
-    RPGraph::GraphLayout layout(graph, w, h);
+    RPGraph::GraphLayout layout(graph);
     RPGraph::ForceAtlas2 *fa2;
     #ifdef __NVCC__
     if(cuda_requested)
@@ -140,7 +158,7 @@ int main(int argc, const char **argv)
             fa2->sync_layout();
 
             if (out_format == "png")
-                layout.writeToPNG(framesize, framesize, op);
+                layout.writeToPNG(image_w, image_h, op);
             else if (out_format == "csv")
                 layout.writeToCSV(op);
             else if (out_format == "bin")
