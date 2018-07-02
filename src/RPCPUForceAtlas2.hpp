@@ -31,7 +31,8 @@ namespace RPGraph
     class CPUForceAtlas2 : public ForceAtlas2
     {
     public:
-        CPUForceAtlas2(GraphLayout &layout);
+        CPUForceAtlas2(GraphLayout &layout, bool use_barneshut, 
+                       bool strong_gravity, float gravity, float scale);
         ~CPUForceAtlas2();
         void doStep() override;
         void sync_layout() override;

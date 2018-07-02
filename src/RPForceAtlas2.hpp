@@ -32,7 +32,8 @@ namespace RPGraph
     class ForceAtlas2 : public LayoutAlgorithm
     {
         public:
-            ForceAtlas2(GraphLayout &layout);
+            ForceAtlas2(GraphLayout &layout, bool use_barneshut, 
+                        bool strong_gravity, float gravity, float scale);
             ~ForceAtlas2();
 
             virtual void doStep() = 0;

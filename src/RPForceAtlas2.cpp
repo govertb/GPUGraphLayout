@@ -25,13 +25,15 @@
 
 namespace RPGraph
 {
-    ForceAtlas2::ForceAtlas2(GraphLayout &layout)
-    : LayoutAlgorithm(layout)
+    ForceAtlas2::ForceAtlas2(GraphLayout &layout, bool use_barneshut, 
+                             bool strong_gravity, float gravity, float scale)
+    : LayoutAlgorithm(layout), use_barneshut{use_barneshut}, 
+      strong_gravity{strong_gravity}
     {
         iteration = 0;
 
-        k_g = 1.0; // Gravitational force
-        k_r = 1.0; // Repulsive force
+        setGravity(gravity);
+        setScale(scale);
 
         global_speed = 1.0;
         speed_efficiency = 1.0;
@@ -47,8 +49,6 @@ namespace RPGraph
         delta = 0.0;
 
         prevent_overlap = false;
-        strong_gravity = false;
-        use_barneshut = true;
         use_linlog = false;
 
         layout.randomizePositions();

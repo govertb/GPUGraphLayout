@@ -34,8 +34,10 @@
 
 namespace RPGraph
 {
-    CUDAForceAtlas2::CUDAForceAtlas2(GraphLayout &layout)
-    : ForceAtlas2(layout)
+    CUDAForceAtlas2::CUDAForceAtlas2(GraphLayout &layout, bool use_barneshut, 
+                                     bool strong_gravity, float gravity, 
+                                     float scale)
+    : ForceAtlas2(layout, use_barneshut, strong_gravity, gravity, scale)
     {
         int deviceCount;
         cudaGetDeviceCount(&deviceCount);

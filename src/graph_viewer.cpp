@@ -129,15 +129,12 @@ int main(int argc, const char **argv)
     RPGraph::ForceAtlas2 *fa2;
     #ifdef __NVCC__
     if(cuda_requested)
-        fa2 = new RPGraph::CUDAForceAtlas2(layout);
+        fa2 = new RPGraph::CUDAForceAtlas2(layout, approximate, 
+                                           strong_gravity, gravity, scale);
     else
     #endif
-        fa2 = new RPGraph::CPUForceAtlas2(layout);
-
-    fa2->strong_gravity = strong_gravity;
-    fa2->use_barneshut = approximate;
-    fa2->setScale(scale);
-    fa2->setGravity(gravity);
+        fa2 = new RPGraph::CPUForceAtlas2(layout, approximate, 
+                                          strong_gravity, gravity, scale);
 
     printf("Started Layout algorithm...\n");
     const int snap_period = ceil((float)max_iterations/num_screenshots);
