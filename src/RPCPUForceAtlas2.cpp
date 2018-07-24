@@ -31,10 +31,10 @@
 namespace RPGraph
 {
     // CPUForceAtlas2 definitions.
-    CPUForceAtlas2::CPUForceAtlas2(GraphLayout &layout, bool use_barneshut, 
-                                   bool strong_gravity, float gravity, 
+    CPUForceAtlas2::CPUForceAtlas2(GraphLayout &layout, bool use_barneshut,
+                                   bool strong_gravity, float gravity,
                                    float scale)
-    :  ForceAtlas2(layout, use_barneshut, strong_gravity, gravity, scale), 
+    :  ForceAtlas2(layout, use_barneshut, strong_gravity, gravity, scale),
        BH_Approximator{layout.getCenter(), layout.getSpan()+10, theta}
     {
         forces      = (Real2DVector *)malloc(sizeof(Real2DVector) * layout.graph.num_nodes());
@@ -211,18 +211,18 @@ namespace RPGraph
             layout.moveNode(n, forces[n] * factor);
         }
     }
-    
+
     void CPUForceAtlas2::rebuild_bh()
     {
         BH_Approximator.reset(layout.getCenter(), layout.getSpan()+10);
-        
+
         for (nid_t n = 0; n < layout.graph.num_nodes(); ++n)
         {
-            BH_Approximator.insertParticle(layout.getCoordinate(n), 
+            BH_Approximator.insertParticle(layout.getCoordinate(n),
                                            layout.graph.degree(n)+1);
         }
     }
-    
+
     void CPUForceAtlas2::doStep()
     {
         if (use_barneshut) rebuild_bh();

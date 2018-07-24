@@ -34,8 +34,8 @@
 
 namespace RPGraph
 {
-    CUDAForceAtlas2::CUDAForceAtlas2(GraphLayout &layout, bool use_barneshut, 
-                                     bool strong_gravity, float gravity, 
+    CUDAForceAtlas2::CUDAForceAtlas2(GraphLayout &layout, bool use_barneshut,
+                                     bool strong_gravity, float gravity,
                                      float scale)
     : ForceAtlas2(layout, use_barneshut, strong_gravity, gravity, scale)
     {
@@ -230,7 +230,7 @@ namespace RPGraph
         SpeedKernel<<<mp_count * FACTOR1, THREADS1>>>(nbodies, fxl, fyl, fx_prevl, fy_prevl, body_massl, swgl, etral);
 
         DisplacementKernel<<<mp_count * FACTOR6, THREADS6>>>(nbodies, body_posl, fxl, fyl, fx_prevl, fy_prevl);
-        
+
         cudaCatchError(cudaDeviceSynchronize());
         iteration++;
     }

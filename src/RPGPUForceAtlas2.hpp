@@ -30,7 +30,7 @@ namespace RPGraph
     class CUDAForceAtlas2: public ForceAtlas2
     {
     public:
-        CUDAForceAtlas2(GraphLayout &layout, bool use_barneshut, 
+        CUDAForceAtlas2(GraphLayout &layout, bool use_barneshut,
                         bool strong_gravity, float gravity, float scale);
         ~CUDAForceAtlas2();
         void doStep() override;

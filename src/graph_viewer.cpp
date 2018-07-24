@@ -68,7 +68,7 @@ int main(int argc, const char **argv)
     int image_w = 1250;
     int image_h = 1250;
 
-    for (int arg_no = 10; arg_no < argc; arg_no++) 
+    for (int arg_no = 10; arg_no < argc; arg_no++)
     {
         if(std::string(argv[arg_no]) == "png")
         {
@@ -77,18 +77,18 @@ int main(int argc, const char **argv)
             image_h = std::stoi(argv[arg_no+2]);
             arg_no += 2;
         }
-        
+
         else if(std::string(argv[arg_no]) == "csv")
         {
             out_format = "csv";
         }
-        
+
         else if(std::string(argv[arg_no]) == "bin")
         {
             out_format = "bin";
         }
     }
-    
+
 
     if(cuda_requested and not approximate)
     {
@@ -129,11 +129,11 @@ int main(int argc, const char **argv)
     RPGraph::ForceAtlas2 *fa2;
     #ifdef __NVCC__
     if(cuda_requested)
-        fa2 = new RPGraph::CUDAForceAtlas2(layout, approximate, 
+        fa2 = new RPGraph::CUDAForceAtlas2(layout, approximate,
                                            strong_gravity, gravity, scale);
     else
     #endif
-        fa2 = new RPGraph::CPUForceAtlas2(layout, approximate, 
+        fa2 = new RPGraph::CPUForceAtlas2(layout, approximate,
                                           strong_gravity, gravity, scale);
 
     printf("Started Layout algorithm...\n");

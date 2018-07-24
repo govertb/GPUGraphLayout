@@ -36,7 +36,7 @@ namespace RPGraph
         bb = position.y - length/2.0;
         ub = position.y + length/2.0;
     }
-    
+
     BarnesHutCell::~BarnesHutCell()
     {
         for (nid_t n = 0; n < 4; ++n) delete sub_cells[n];
@@ -69,12 +69,12 @@ namespace RPGraph
     {
         delete root_cell; // this recursively deletes the entire tree
         root_cell = nullptr;
-        
+
         this->root_center = root_center;
         this->root_length = root_length;
     }
 
-    
+
     Real2DVector BarnesHutApproximator::approximateForce(Coordinate particle_pos, float particle_mass, float theta)
     {
         Real2DVector force = Real2DVector(0.0, 0.0);
@@ -112,10 +112,10 @@ namespace RPGraph
     {
         if(not root_cell)
         {
-            root_cell = new BarnesHutCell(this->root_center, this->root_length, 
+            root_cell = new BarnesHutCell(this->root_center, this->root_length,
                                           particle_position, particle_mass);
         }
-        
+
         else
         {
             BarnesHutCell *cur_cell = root_cell;

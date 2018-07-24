@@ -25,9 +25,9 @@
 
 namespace RPGraph
 {
-    ForceAtlas2::ForceAtlas2(GraphLayout &layout, bool use_barneshut, 
+    ForceAtlas2::ForceAtlas2(GraphLayout &layout, bool use_barneshut,
                              bool strong_gravity, float gravity, float scale)
-    : LayoutAlgorithm(layout), use_barneshut{use_barneshut}, 
+    : LayoutAlgorithm(layout), use_barneshut{use_barneshut},
       strong_gravity{strong_gravity}
     {
         iteration = 0;
@@ -41,11 +41,11 @@ namespace RPGraph
 
         k_s = 0.1;
         k_s_max = 10.0;
-        
+
         theta = 1.0;
         epssq  = 0.05 * 0.05;
         itolsq = 1.0f / (theta * theta);
-        
+
         delta = 0.0;
 
         prevent_overlap = false;

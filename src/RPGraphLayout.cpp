@@ -167,7 +167,7 @@ namespace RPGraph
         setY(node_id, c.y);
     }
 
-    void GraphLayout::writeToPNG(const int image_w, const int image_h, 
+    void GraphLayout::writeToPNG(const int image_w, const int image_h,
                                  std::string path)
     {
         const float xRange = getXRange();

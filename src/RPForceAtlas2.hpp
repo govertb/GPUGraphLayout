@@ -32,7 +32,7 @@ namespace RPGraph
     class ForceAtlas2 : public LayoutAlgorithm
     {
         public:
-            ForceAtlas2(GraphLayout &layout, bool use_barneshut, 
+            ForceAtlas2(GraphLayout &layout, bool use_barneshut,
                         bool strong_gravity, float gravity, float scale);
             ~ForceAtlas2();
 
@@ -52,7 +52,7 @@ namespace RPGraph
             // Parameters used in adaptive temperature
             float speed_efficiency, jitter_tolerance;
             float k_s, k_s_max; // magic constants related to swinging.
-            
+
             // Barnes-Hut parameters
             float theta;   // Accuracy
             float epssq;   // Softening (Epsilon, squared)
