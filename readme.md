@@ -44,7 +44,8 @@ To compile without CUDA support, run `make graph_viewer CUDA_SUPPORT=0`.
 `exact|approximate`  : choose between the exact/pairwise O(|V|^2) repulsive force calculation or the O(|V|lg(|V|))
                      approximation using Barnes-Hut (GPU implementation only supports Barnes-Hut)
 
-`edgelist_path`      : ASCII file containing node IDs for each edge on a separate line (whitespace separated)
+`edgelist_path`      : Text file (ascii) containing node IDs for each edge on a separate line (whitespace separated).
+                       Lines starting with a `#` and self-loops are ignored.
 
 `out_path`           : path to write resulting layout to
 
