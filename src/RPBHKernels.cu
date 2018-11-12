@@ -658,7 +658,7 @@ void ForceCalculationKernel(int nnodesd, int nbodiesd, float itolsqd, float epss
                         }
 
                         // or, if n is cell, ensure all threads agree that cell is far enough away
-                        else if(__all(tmp >= dq[depth]))
+                        else if(__all_sync(__activemask(), tmp >= dq[depth]))
                         {
                             ax += k_rd * dx * body_massd[i] * node_massd[n] / tmp;
                             ay += k_rd * dy * body_massd[i] * node_massd[n] / tmp;
