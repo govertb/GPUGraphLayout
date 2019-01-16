@@ -1,7 +1,7 @@
 `graph_viewer` | GPU accelerated graph layout
 =============================================
 
-This repository contains experimental code for large scale graph layout using the GPU. Currently we only implement the basics of ForceAtlas2, a graph layout algorithm  designed for social network visualization in Gephi<sup>[1](#jacomy14),[2](#bastian09)</sup>. Our implementation of ForceAtlas2 is based on [the open source implementation](https://github.com/gephi/gephi/tree/6efb108718fa67d1055160f3a18b63edb4ca7be2/modules/LayoutPlugin/src/main/java/org/gephi/layout/plugin/forceAtlas2) used in Gephi itself. For force approximation, we use a CUDA implementation of the Barnes-Hut approximation algorithm<sup>[3](#barnes86)</sup> by Martin Burtscher and Keshav Pingali<sup>[4](#burtscher11)</sup>. This implementation is available as part of [LonstarGPU](http://iss.ices.utexas.edu/?p=projects/galois/lonestargpu). The average speedup, compared to a *de facto* CPU implementation of ForceAtlas2, is over 40x. This makes it feasible to compute layouts for networks with millions of nodes and edges. More details and results can be found in:
+This repository contains experimental code for large scale graph layout using the GPU. Currently we only implement the basics of ForceAtlas2, a graph layout algorithm  designed for social network visualization in Gephi<sup>[1](#jacomy14),[2](#bastian09)</sup>. Our implementation of ForceAtlas2 is based on [the open source implementation](https://github.com/gephi/gephi/tree/6efb108718fa67d1055160f3a18b63edb4ca7be2/modules/LayoutPlugin/src/main/java/org/gephi/layout/plugin/forceAtlas2) used in Gephi itself, and considers the graph to be undirected. For force approximation, we use a CUDA implementation of the Barnes-Hut approximation algorithm<sup>[3](#barnes86)</sup> by Martin Burtscher and Keshav Pingali<sup>[4](#burtscher11)</sup>. This implementation is available as part of [LonstarGPU](http://iss.ices.utexas.edu/?p=projects/galois/lonestargpu). The average speedup, compared to a *de facto* CPU implementation of ForceAtlas2, is over 40x. This makes it feasible to compute layouts for networks with millions of nodes and edges. More details and results can be found in:
 
 * G.G. Brinkmann, [K.F.D. Rietveld](https://liacs.leidenuniv.nl/~rietveldkfd) and [F.W. Takes](https://liacs.leidenuniv.nl/~takesfw), [Exploiting GPUs for fast force-directed visualization of large-scale networks](https://dx.doi.org/10.1109/ICPP.2017.47), in Proceedings of the 46th International Conference on Parallel Processing (ICPP), pp. 382-391, 2017.
 
@@ -45,7 +45,7 @@ To compile without CUDA support, run `make graph_viewer CUDA_SUPPORT=0`.
                      approximation using Barnes-Hut (GPU implementation only supports Barnes-Hut)
 
 `edgelist_path`      : Text file (ascii) containing node IDs for each edge on a separate line (whitespace separated).
-                       Lines starting with a `#` and self-loops are ignored.
+                       Lines starting with a `#`, the direction of edges, and self-loops are ignored.
 
 `out_path`           : path to write resulting layout to
 
