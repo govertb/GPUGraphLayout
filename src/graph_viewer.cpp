@@ -43,6 +43,17 @@
 #include "RPGPUForceAtlas2.hpp"
 #endif
 
+std::string basename(const char* &path)
+{
+    // Create the prefix for the output files.
+    std::string path_str(path);
+    size_t name_index = path_str.find_last_of('/');
+    if (name_index != std::string::npos)
+        return path_str.substr(name_index);
+    else
+        return path_str;
+}
+
 int main(int argc, const char **argv)
 {
     // For reproducibility.
@@ -146,8 +157,7 @@ int main(int argc, const char **argv)
         // If we need to, write the result to a png
         if (num_screenshots > 0 && (iteration % snap_period == 0 || iteration == max_iterations))
         {
-            std::string ip(edgelist_path);
-            std::string of = ip.substr(ip.find_last_of('/'));
+            std::string of = basename(edgelist_path);
             of.append("_").append(std::to_string(iteration)).append(".").append(out_format);
             std::string op = std::string(out_path).append("/").append(of);
             printf("Starting iteration %d (%.2f%%), writing %s...", iteration, 100*(float)iteration/max_iterations, out_format.c_str());
