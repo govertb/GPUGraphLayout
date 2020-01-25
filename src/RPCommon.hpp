@@ -23,6 +23,7 @@
 
 #ifndef RPCommonUtils_hpp
 #define RPCommonUtils_hpp
+#include <string>
 
 #ifdef __NVCC__
 #include <cuda_runtime_api.h>
@@ -39,7 +40,8 @@ inline void assert_d(cudaError_t code, const char *file, int line, bool abort=tr
     }
 }
 #endif
-bool is_file_exists (const char *filename);
+bool is_file_exists(std::string filepath);
+std::string basename(std::string filepath);
 
 namespace RPGraph
 {
