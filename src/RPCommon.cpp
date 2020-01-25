@@ -23,14 +23,26 @@
 
 #include "RPCommon.hpp"
 #include <stdlib.h>
+#include <string.h>
 #include <cmath>
 #include <fstream>
+#include <string>
 
 // by http://stackoverflow.com/a/19841704
-bool is_file_exists (const char *filename)
+bool is_file_exists(std::string filepath)
 {
-    std::ifstream infile(filename);
+    std::ifstream infile(filepath);
     return infile.good();
+}
+
+// wrap libgen basename until C++17
+std::string basename(std::string filepath)
+{
+    char *result_p = new char[filepath.size() + 1];
+    strcpy(result_p, filepath.c_str());
+    std::string result = basename(result_p);
+    delete[] result_p;
+    return result;
 }
 
 namespace RPGraph

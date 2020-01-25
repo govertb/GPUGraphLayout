@@ -62,8 +62,8 @@ int main(int argc, const char **argv)
     const float scale = std::stof(argv[5]);
     const float gravity = std::stof(argv[6]);
     const bool approximate = std::string(argv[7]) == "approximate";
-    const char *edgelist_path = argv[8];
-    const char *out_path = argv[9];
+    std::string edgelist_path = argv[8];
+    std::string out_path = argv[9];
     std::string out_format = "png";
     int image_w = 1250;
     int image_h = 1250;
@@ -146,20 +146,20 @@ int main(int argc, const char **argv)
         // If we need to, write the result to a png
         if (num_screenshots > 0 && (iteration % snap_period == 0 || iteration == max_iterations))
         {
-            std::string ip(edgelist_path);
-            std::string of = ip.substr(ip.find_last_of('/'));
-            of.append("_").append(std::to_string(iteration)).append(".").append(out_format);
-            std::string op = std::string(out_path).append("/").append(of);
+	    // Determine output filename
+	    std::string edgelist_basename = basename(edgelist_path);
+	    std::string out_filename = edgelist_basename + "_" + std::to_string(iteration) + "." + out_format;
+            std::string out_filepath = out_path + "/" + out_filename;
             printf("Starting iteration %d (%.2f%%), writing %s...", iteration, 100*(float)iteration/max_iterations, out_format.c_str());
             fflush(stdout);
             fa2->sync_layout();
 
             if (out_format == "png")
-                layout.writeToPNG(image_w, image_h, op);
+                layout.writeToPNG(image_w, image_h, out_filepath);
             else if (out_format == "csv")
-                layout.writeToCSV(op);
+                layout.writeToCSV(out_filepath);
             else if (out_format == "bin")
-                layout.writeToBin(op);
+                layout.writeToBin(out_filepath);
 
             printf("done.\n");
         }
