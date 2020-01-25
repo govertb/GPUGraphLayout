@@ -99,12 +99,12 @@ int main(int argc, const char **argv)
     // Check in_path and out_path
     if (!is_file_exists(edgelist_path))
     {
-        fprintf(stderr, "error: No edgelist at %s\n", edgelist_path);
+        fprintf(stderr, "error: No edgelist at %s\n", edgelist_path.c_str());
         exit(EXIT_FAILURE);
     }
     if (!is_file_exists(out_path))
     {
-        fprintf(stderr, "error: No output folder at %s\n", out_path);
+        fprintf(stderr, "error: No output folder at %s\n", out_path.c_str());
         exit(EXIT_FAILURE);
     }
 
@@ -118,7 +118,7 @@ int main(int argc, const char **argv)
     #endif
 
     // Load graph.
-    printf("Loading edgelist at '%s'...", edgelist_path);
+    printf("Loading edgelist at '%s'...", edgelist_path.c_str());
     fflush(stdout);
     RPGraph::UGraph graph = RPGraph::UGraph(edgelist_path);
     printf("done.\n");
