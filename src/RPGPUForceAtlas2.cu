@@ -205,31 +205,42 @@ namespace RPGraph
 
     void CUDAForceAtlas2::doStep()
     {
+        cudaGetLastError(); // clear any errors
         GravityKernel<<<mp_count * FACTOR6, THREADS6>>>(nbodies, k_g, strong_gravity, body_massl, body_posl, fxl, fyl);
+        cudaCatchError(cudaGetLastError());
 
         AttractiveForceKernel<<<mp_count * FACTOR6, THREADS6>>>(nedges, body_posl, fxl, fyl, sourcesl, targetsl);
+        cudaCatchError(cudaGetLastError());
 
         BoundingBoxKernel<<<mp_count * FACTOR1, THREADS1>>>(nnodes, nbodies, startl, childl, node_massl, body_posl, node_posl, maxxl, maxyl, minxl, minyl);
+        cudaCatchError(cudaGetLastError());
 
         // Build Barnes-Hut Tree
         // 1.) Set all child pointers of internal nodes (in childl) to null (-1)
         ClearKernel1<<<mp_count, 1024>>>(nnodes, nbodies, childl);
+        cudaCatchError(cudaGetLastError());
         // 2.) Build the tree
         TreeBuildingKernel<<<mp_count * FACTOR2, THREADS2>>>(nnodes, nbodies, childl, body_posl, node_posl);
+        cudaCatchError(cudaGetLastError());
         // 3.) Set all cell mass values to -1.0, set all startd to null (-1)
         ClearKernel2<<<mp_count, 1024>>>(nnodes, startl, node_massl);
+        cudaCatchError(cudaGetLastError());
 
         // Recursively compute mass for each BH. cell.
         SummarizationKernel<<<mp_count * FACTOR3, THREADS3>>>(nnodes, nbodies, countl, childl, body_massl, node_massl, body_posl, node_posl);
+        cudaCatchError(cudaGetLastError());
 
         SortKernel<<<mp_count * FACTOR4, THREADS4>>>(nnodes, nbodies, sortl, countl, startl, childl);
 
         // Compute repulsive forces between nodes using BH. tree.
         ForceCalculationKernel<<<mp_count * FACTOR5, THREADS5>>>(nnodes, nbodies, itolsq, epssq, sortl, childl, body_massl, node_massl, body_posl, node_posl, fxl, fyl, k_r);
+        cudaCatchError(cudaGetLastError());
 
         SpeedKernel<<<mp_count * FACTOR1, THREADS1>>>(nbodies, fxl, fyl, fx_prevl, fy_prevl, body_massl, swgl, etral);
+        cudaCatchError(cudaGetLastError());
 
         DisplacementKernel<<<mp_count * FACTOR6, THREADS6>>>(nbodies, body_posl, fxl, fyl, fx_prevl, fy_prevl);
+        cudaCatchError(cudaGetLastError());
 
         cudaCatchError(cudaDeviceSynchronize());
         iteration++;
