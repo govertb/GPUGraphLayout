@@ -231,6 +231,7 @@ namespace RPGraph
         cudaCatchError(cudaGetLastError());
 
         SortKernel<<<mp_count * FACTOR4, THREADS4>>>(nnodes, nbodies, sortl, countl, startl, childl);
+        cudaCatchError(cudaGetLastError());
 
         // Compute repulsive forces between nodes using BH. tree.
         ForceCalculationKernel<<<mp_count * FACTOR5, THREADS5>>>(nnodes, nbodies, itolsq, epssq, sortl, childl, body_massl, node_massl, body_posl, node_posl, fxl, fyl, k_r);
