@@ -49,7 +49,7 @@ int main(int argc, const char **argv)
     srandom(1234);
 
     // Parse commandline arguments
-    if (argc < 10)
+    if (argc < 10 or (std::string(argv[10]) == "png" and argc < 12))
     {
         fprintf(stderr, "Usage: graph_viewer gpu|cpu max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path [png image_w image_h|csv|bin]\n");
         exit(EXIT_FAILURE);
