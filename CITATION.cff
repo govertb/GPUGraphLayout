@@ -1,0 +1,76 @@
+cff-version: 1.2.0
+message: "Please use the conference paper under 'preferred-citation' to cite this project."
+title: "GPUGraphLayout"
+authors:
+  - family-names: "Brinkmann"
+    given-names: "Govert G."
+    orcid: "https://orcid.org/0000-0002-2713-213X"
+date-released: 2017-09-18
+repository: "https://github.com/govertb/GPUGraphLayout"
+identifiers:
+  - description: "Collection of archived snapshots of GPUGraphLayout"
+    type: doi
+    value: 10.5281/zenodo.6334692
+keywords:
+  - "visualization"
+  - "graph-algorithms"
+  - "cuda"
+  - "gephi"
+  - "social-network-analysis"
+  - "forceatlas2"
+  - "graph-layout"
+license: "AGPL-3.0"
+preferred-citation:
+  type: conference-paper
+  title: "Exploiting GPUs for Fast Force-Directed Visualization of Large-Scale Networks"
+  journal: "46th International Conference on Parallel Processing"
+  year: 2017
+  month: 9
+  start: 382
+  end: 391
+  date-released: 2017-09-07
+  languages:
+    - "en"
+  authors:
+    - family-names: "Brinkmann"
+      given-names: "Govert G."
+      affiliation: "Leiden Institute of Advanced Computer Science (LIACS)"
+      orcid: "https://orcid.org/0000-0002-2713-213X"
+    - family-names: "Rietveld"
+      given-names: "Kristian F. D."
+      affiliation: "Leiden Institute of Advanced Computer Science (LIACS)"
+      orcid: "https://orcid.org/0000-0003-0455-3430"
+    - family-names: "Takes"
+      given-names: "Frank W."
+      affiliation: "Leiden Institute of Advanced Computer Science (LIACS)"
+      orcid: "https://orcid.org/0000-0001-5468-1030"
+  institution:
+    name: "Leiden Institute of Advanced Computer Science"
+    alias: "LIACS"
+    address: "Niels Bohrweg 2"
+    post-code: "2333 CA"
+    city: "Leiden"
+    country: "NL"
+    website: "https://liacs.leidenuniv.nl"
+  conference:
+    name: "46th International Conference on Parallel Processing"
+    alias: "ICPP 2017"
+    country: "GB"
+    city: "Bristol"
+    date-start: "2017-08-14"
+    date-end: "2017-08-17"
+    website: "https://www.icpp-conf.org/2017/"
+  publisher:
+    name: "IEEE"
+    website: "https://ieee.org"
+  copyright: "© 2017 IEEE"
+  doi: "10.1109/ICPP.2017.47"
+  url: "https://doi.org/10.1109/ICPP.2017.47"
+  isbn: "9781538610428"
+  issn: "2332-5690"
+  keywords:
+  - "Network visualization"
+  - "force-directed graph layout"
+  - "large-scale networks"
+  - "parallel programming"
+  - "CUDA"
