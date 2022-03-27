@@ -6,6 +6,10 @@ This repository contains experimental code for large scale graph layout using th
 * G.G. Brinkmann, [K.F.D. Rietveld](https://liacs.leidenuniv.nl/~rietveldkfd) and [F.W. Takes](https://liacs.leidenuniv.nl/~takesfw), [Exploiting GPUs for fast force-directed visualization of large-scale networks](https://dx.doi.org/10.1109/ICPP.2017.47), in Proceedings of the 46th International Conference on Parallel Processing (ICPP), pp. 382-391, 2017.
 
 
+#### Citing
+To cite this software, please use the aforementioned reference, or the `preferred-citation` section in [CITATION.cff](./CITATION.cff). The latter can be converted to the desired format using [various tools](https://github.com/citation-file-format/citation-file-format/tree/52647a247e9b1a5b04154934f39615b5ee8c4d65#tools-to-work-with-citationcff-files-wrench), or using the _Cite this repository_ button in the _About_ section of [this project's GitHub page](https://github.com/govertb/GPUGraphLayout).
+
+
 #### System Requirements
 
 A CUDA capable GPU. Currently only Linux is supported.
