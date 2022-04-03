@@ -57,8 +57,8 @@ preferred-citation:
     alias: "ICPP 2017"
     country: "GB"
     city: "Bristol"
-    date-start: "2017-08-14"
-    date-end: "2017-08-17"
+    date-start: 2017-08-14
+    date-end: 2017-08-17
     website: "https://www.icpp-conf.org/2017/"
   publisher:
     name: "IEEE"
