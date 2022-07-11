@@ -32,26 +32,18 @@ To compile without CUDA support, run `make graph_viewer CUDA_SUPPORT=0`.
 #### Usage
 `graph_viewer gpu|cpu max_iterations num_snaps sg|wg scale gravity exact|approximate edgelist_path out_path [png|csv|bin]`
 
-`gpu|cpu`            : choose between a parallel GPU implementation or a serial CPU implementation.
 
-`max_iterations`     : how many iterations of the layout algorithm to run
-
-`num_snaps`          : choose how many times during the layout process a visualization should be rendered
-
-`wg|sg`              : choose between weak gravity (inversely proportional to distance) or
-                     strong gravity
-
-`scale`              : scale repulsive force
-
-`gravity`            : scale gravitational force
-
-`exact|approximate`  : choose between the exact/pairwise O(|V|^2) repulsive force calculation or the O(|V|lg(|V|))
-                     approximation using Barnes-Hut (GPU implementation only supports Barnes-Hut)
-
-`edgelist_path`      : Text file (ascii) containing node IDs for each edge on a separate line (whitespace separated).
-                       Lines starting with a `#`, the direction of edges, and self-loops are ignored.
-
-`out_path`           : path to write resulting layout to
+| Argument             | Description |
+| -------------------- | ----------- |
+| `gpu\|cpu`           | Choose between a parallel GPU implementation or a serial CPU implementation. |
+| `max_iterations`     | How many iterations of the layout algorithm to run. |
+| `num_snaps`          | Choose how many times during the layout process a visualization should be rendered. |
+| `wg\|sg`             | Choose between weak gravity (inversely proportional to distance) or strong gravity. |
+| `scale`              | Scale repulsive force. |
+| `gravity`            | Scale gravitational force. |
+| `exact\|approximate` | Choose between the exact/pairwise $O(\|V\|^2)$ repulsive force calculation or the $O(\|V\| \log \|V\|)$ approximation using Barnes-Hut (GPU implementation only supports Barnes-Hut). |
+| `edgelist_path`      | Text file (ascii) containing node IDs for each edge on a separate line (whitespace separated). Lines starting with a `#`, the direction of edges, and self-loops are ignored. |
+| `out_path`           | Path to write resulting layout to. |
 
 `[png|csv|bin]` is optional, defaulting to `png`, and determines the format of the layout written to `out_path`.
 
